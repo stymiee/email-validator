@@ -10,6 +10,6 @@ class BasicValidator extends AValidator
 {
     public function validate(EmailAddress $email): bool
     {
-        return filter_var($email->getEmailAddress(), FILTER_VALIDATE_EMAIL);
+        return (bool) filter_var($email->getEmailAddress(), FILTER_VALIDATE_EMAIL);
     }
 }
