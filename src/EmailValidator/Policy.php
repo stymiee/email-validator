@@ -37,8 +37,8 @@ class Policy
         $this->checkBannedListedEmail = (bool) ($config['checkBannedListedEmail'] ?? false);
         $this->checkDisposableEmail   = (bool) ($config['checkDisposableEmail']   ?? false);
 
-        $this->bannedList             = $config['bannedList']                    ?? [];
-        $this->disposableList         = $config['disposableList']                ?? [];
+        $this->bannedList             = $config['bannedList']     ?? [];
+        $this->disposableList         = $config['disposableList'] ?? [];
     }
 
     /**
