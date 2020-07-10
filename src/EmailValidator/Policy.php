@@ -33,9 +33,9 @@ class Policy
 
     public function __construct(array $config = [])
     {
-        $this->checkMxRecords         = (bool) $config['checkMxRecords']         ?? false;
-        $this->checkBannedListedEmail = (bool) $config['checkBannedListedEmail'] ?? false;
-        $this->checkDisposableEmail   = (bool) $config['checkDisposableEmail']   ?? false;
+        $this->checkMxRecords         = (bool) ($config['checkMxRecords']         ?? false);
+        $this->checkBannedListedEmail = (bool) ($config['checkBannedListedEmail'] ?? false);
+        $this->checkDisposableEmail   = (bool) ($config['checkDisposableEmail']   ?? false);
 
         $this->bannedList             = $config['bannedList']                    ?? [];
         $this->disposableList         = $config['disposableList']                ?? [];
