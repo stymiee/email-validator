@@ -52,8 +52,8 @@ class EmailValidator
 
         $policy = new Policy($config);
 
-        $this->basicValidator = new BasicValidator($policy);
         $this->mxValidator = new MxValidator($policy);
+        $this->basicValidator = new BasicValidator($policy);
         $this->bannedListValidator = new BannedListValidator($policy);
         $this->disposableEmailValidator = new DisposableEmailValidator($policy);
     }
@@ -81,6 +81,11 @@ class EmailValidator
         return $this->reason === self::NO_ERROR;
     }
 
+    /**
+     * Returns an error message for invalid email addresses
+     *
+     * @return string
+     */
     public function getErrorReason(): string
     {
         switch ($this->reason)
