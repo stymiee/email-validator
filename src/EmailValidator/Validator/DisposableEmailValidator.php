@@ -13,7 +13,7 @@ class DisposableEmailValidator extends AValidator
         $valid = true;
         if ($this->policy->checkDisposableEmail()) {
             $domain = $email->getDomain();
-            return in_array($domain, $this->policy->getDisposableList(), true);
+            return !in_array($domain, $this->policy->getDisposableList(), true);
         }
         return $valid;
     }
