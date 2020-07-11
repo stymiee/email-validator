@@ -13,7 +13,7 @@ class BannedListValidator extends AValidator
         $valid = true;
         if ($this->policy->checkBannedListedEmail()) {
             $domain = $email->getDomain();
-            return in_array($domain, $this->policy->getBannedList(), true);
+            return !in_array($domain, $this->policy->getBannedList(), true);
         }
         return $valid;
     }
