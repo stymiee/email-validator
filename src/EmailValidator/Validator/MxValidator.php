@@ -12,8 +12,8 @@ class MxValidator extends AValidator
     {
         $valid = true;
         if ($this->policy->validateMxRecord()) {
-            $domain = $email->getDomain();
-            $valid = checkdnsrr(idn_to_ascii($domain), 'MX');
+            $domain = sprintf('%s.', $email->getDomain());
+            $valid = checkdnsrr(idn_to_ascii($domain, 0, INTL_IDNA_VARIANT_UTS46), 'MX');
         }
         return $valid;
     }
