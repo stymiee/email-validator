@@ -5,6 +5,8 @@ Here are some tips, solutions to common problems, and guides for testing.
 
 ### Use default settings
 
+The default settings offer good accuracy that an email address is valid and is performant. If you wish to be stricter,
+enable `checkDisposableEmail` to prevent potentially low value users from utilizing your web application.
 
 ## Asking for help on Stack Overflow
 Be sure when you [ask a question](http://stackoverflow.com/questions/ask?tags=php,email,validation) pertaining to the 
@@ -22,6 +24,3 @@ A good question will include all the following:
 - Any error message(s) you are getting
 
 **Do not use Stack Overflow to report bugs.** Bugs may be reported [here](https://github.com/stymiee/email-validator/issues/new).
-
-## Helpful Links
-
