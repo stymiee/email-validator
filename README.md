@@ -1,6 +1,13 @@
-# PHP Simple Encryption (php-simple-encryption)
+# PHP Email Validator (email-validator)
 
+The PHP Email Validator will validate an email address for all or some of the following conditions:
 
+- is in a valid format
+- has configured MX records (optional)
+- is not a disposable email address (optional)
+- is not a banned email domain (optional)
+
+The Email Validator is configurable so you have full control over how much validation will occur.
 
 ## Requirements
 
@@ -18,34 +25,134 @@ Here is a minimal example of a `composer.json` file that just defines a dependen
             "stymiee/email-validator": "^1"
         }
     }
-
-## Basic Usage
-
-    require('./vendor/autoload.php');
-        
     
+## Functional Description
+
+The Email Validator library builds upon PHP's built in `filter_var($emailAddress, FILTER_VALIDATE_EMAIL);` by adding a 
+default MX record check. It also offers additional validation against disposable email addresses and a custom banned
+domain list.
+
+### Validate MX 
+
+If `checkMxRecords` is set to `true` in the configuration (see below) the domain name will be validated to ensure it 
+exists and has MX records configured. If the domain does not exist or no MX records exist the odds are the email address
+is not in use.
+
+### Restrict Disposable Email Addresses
+
+Many users who are abusing a system, or not using that system as intended, can use a disposable email service who 
+provides a short-lived (approximately 10 minutes) email address to be used for registrations or user confirmations. If
+`checkDisposableEmail` is set to `true` in the configuration (see below) the domain name will be validated to ensure 
+it is not associated with a disposable email address provider. 
+
+You can add you own domains to this list if you find the public list providers do not have one you
+have identified in their lists. Examples are provided in the `examples` directory which demonstrate how to do this.
+
+### Restrict Banned Domains
+
+If you have users from a domain abusing your system, or you have business rules that require the blocking of certain 
+domains (i.e. public email providers like Gmail or Yahoo mail), you can block then by setting `checkBannedListedEmail` 
+to `true` in the configuration (see below) and providing an array of banned domains. Examples are provided in the 
+`examples` directory which demonstrate how to do this.
+
+### Configuration
+
+To configure the Email Validator you can pass an array with the follow parameters/values:
+
+#### checkMxRecords
+
+A boolean value that enables/disables MX record validation. Enabled by default.
+
+#### checkBannedListedEmail
+
+A boolean value that enables/disables banned domain validation. Disabled by default.
+
+#### checkDisposableEmail
+
+A boolean value that enables/disables disposable email address validation. Disabled by default.
+
+#### bannedList
+
+An array of domains that are not allowed to be used for email addresses.
+
+#### disposableList
+
+An array of domains that are suspected disposable email address providers.
+
+**Example**
+
+    $config = [
+        'checkMxRecords' => true,
+        'checkBannedListedEmail' => true,
+        'checkDisposableEmail' => true,
+        'bannedList' => $bannedDomainList,
+        'disposableList' => $customDisposableEmailList,
+    ];
+    $emailValidator = new EmailValidator($config);
+
+### Example
+
+    <?php
+    use EmailValidator\EmailValidator;
+    
+    require('../vendor/autoload.php');
+    
+    $customDisposableEmailList = [
+        'example.com',
+    ];
+    
+    $bannedDomainList = [
+        'domain.com',
+    ];
+    
+    $testEmailAddresses = [
+        'test@gmail.com',
+        'test@hotmail.com',
+        'test@outlook.com',
+        'test@yahoo.com',
+        'test@domain.com',
+        'test@mxfuel.com',
+        'test@example.com',
+        'test@nobugmail.com',
+        'test@cellurl.com',
+        'test@10minutemail.com',
+    ];
+    
+    $config = [
+        'checkMxRecords' => true,
+        'checkBannedListedEmail' => true,
+        'checkDisposableEmail' => true,
+        'bannedList' => $bannedDomainList,
+        'disposableList' => $customDisposableEmailList,
+    ];
+    $emailValidator = new EmailValidator($config);
+    
+    foreach($testEmailAddresses as $emailAddress) {
+        $emailIsValid = $emailValidator->validate($emailAddress);
+        echo  ($emailIsValid) ? 'Email is valid' : $emailValidator->getErrorReason();
+        echo PHP_EOL;
+    }
+    
+**Output**
+
+    Email is valid
+    Email is valid
+    Email is valid
+    Email is valid
+    Domain is banned
+    Domain does not accept email
+    Domain is used by disposable email providers
+    Domain is used by disposable email providers
+    Domain is used by disposable email providers
+    Domain is used by disposable email providers    
   
 ## Notes
 
+The email address is checked against a list of known disposable email address providers which are aggregated from
+public disposable email address provider lists. This requires making HTTP requests to get the lists when validating 
+the address.
 
 ## Support
 
 If you require assistance using this library start by viewing the [HELP.md](HELP.md) file included in this package. It 
-includes common problems and their solutions.
-
-If you need additional assistance, I can be found at Stack Overflow. Be sure when you 
-[ask a question](http://stackoverflow.com/questions/ask?tags=php,email,validation) pertaining to the  usage of this 
-library be sure to tag your question with the **PHP**, **email**, **validation** tags. Make sure you follow their
-[guide for asking a good question](http://stackoverflow.com/help/how-to-ask) as poorly asked questions will be closed, 
-and I will not be able to assist you.
-
-A good question will include all the following:
-- A description of the problem (what are you trying to do? what results are you expecting? what results are you actually getting?)
-- The code you are using (only post the relevant code)
-- Your unencrypted text
-- The key you are using
-- The IV you are using
-- The output of your method call(s)
-- Any error message(s) you are getting
-
-**Do not use Stack Overflow to report bugs.** Bugs may be reported [here](https://github.com/stymiee/email-validator/issues/new).
+includes common problems and solutions as well hwo to ask for additional assistance.
