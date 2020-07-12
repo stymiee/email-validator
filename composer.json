@@ -19,7 +19,6 @@
     ],
     "require": {
         "php": ">=7.2.0",
-        "ext-openssl": "*",
         "ext-json": "*"
     },
     "require-dev": {
@@ -39,6 +38,6 @@
         "test": "phpunit",
         "phpcs": "php vendor/squizlabs/php_codesniffer/bin/phpcs ./src --report-file=build/phpcs/report.txt --runtime-set ignore_warnings_on_exit 1 --runtime-set ignore_errors_on_exit 1",
         "phpmd": "php vendor/phpmd/phpmd/src/bin/phpmd src/ html cleancode --reportfile build/phpmd/report.html --ignore-violations-on-exit",
-        "insights": ".\\vendor\\bin\\phpinsights.bat analyse src/Encryption --format=console > build/insights/report.txt"
+        "insights": ".\\vendor\\bin\\phpinsights.bat analyse src/EmailValidator --format=console > build/insights/report.txt"
     }
 }
