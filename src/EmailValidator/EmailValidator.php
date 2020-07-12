@@ -88,21 +88,20 @@ class EmailValidator
      */
     public function getErrorReason(): string
     {
-        switch ($this->reason)
-        {
-            case self::FAIL_BASIC :
+        switch ($this->reason) {
+            case self::FAIL_BASIC:
                 $msg = 'Invalid format';
                 break;
-            case self::FAIL_MX_RECORD :
+            case self::FAIL_MX_RECORD:
                 $msg = 'Domain does not accept email';
                 break;
-            case self::FAIL_BANNED_DOMAIN :
+            case self::FAIL_BANNED_DOMAIN:
                 $msg = 'Domain is banned';
                 break;
-            case self::FAIL_DISPOSABLE_DOMAIN :
+            case self::FAIL_DISPOSABLE_DOMAIN:
                 $msg = 'Domain is used by disposable email providers';
                 break;
-            default :
+            default:
                 $msg = '';
         }
 

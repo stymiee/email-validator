@@ -9,7 +9,7 @@ use EmailValidator\EmailAddress;
 class DisposableEmailValidator extends AValidator
 {
     /**
-     * @var string[] Array of URLs containing a list of disposable email addresses and the format of that list.
+     * @var array Array of URLs containing a list of disposable email addresses and the format of that list.
      */
     private static $disposableEmailListProviders = [
         [
@@ -57,8 +57,11 @@ class DisposableEmailValidator extends AValidator
     {
         $providers = [];
         foreach (self::$disposableEmailListProviders as $provider) {
-            if (filter_var($provider['url'], FILTER_VALIDATE_URL) && $content = @file_get_contents($provider['url'])) {
-                $providers[] = $this->getExternalList($content, $provider['format']);
+            if (filter_var($provider['url'], FILTER_VALIDATE_URL)) {
+                $content = @file_get_contents($provider['url']);
+                if ($content) {
+                    $providers[] = $this->getExternalList($content, $provider['format']);
+                }
             }
         }
         return array_filter(array_unique(array_merge($this->policy->getDisposableList(), ...$providers)));
@@ -73,12 +76,12 @@ class DisposableEmailValidator extends AValidator
      */
     public function getExternalList(string $content, string $type): array
     {
-        switch($type) {
-            case 'json' :
+        switch ($type) {
+            case 'json':
                 $providers = json_decode($content, true);
                 break;
-            case 'txt' :
-            default :
+            case 'txt':
+            default:
                 $providers = explode("\n", str_replace("\r\n", "\n", $content));
                 break;
         }
