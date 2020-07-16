@@ -7,7 +7,7 @@ The PHP Email Validator will validate an email address for all or some of the fo
 - is not a disposable email address (optional)
 - is not a banned email domain (optional)
 
-The Email Validator is configurable so you have full control over how much validation will occur.
+The Email Validator is configurable, so you have full control over how much validation will occur.
 
 ## Requirements
 
@@ -71,6 +71,11 @@ A boolean value that enables/disables banned domain validation. Disabled by defa
 
 A boolean value that enables/disables disposable email address validation. Disabled by default.
 
+#### localDisposableOnly
+
+A boolean value that when set to `true` will not retrieve third party disposable email provider lists. Use this if you 
+cache the list of providers locally which is useful when performance matters. Disabled by default.
+
 #### bannedList
 
 An array of domains that are not allowed to be used for email addresses.
@@ -85,6 +90,7 @@ An array of domains that are suspected disposable email address providers.
         'checkMxRecords' => true,
         'checkBannedListedEmail' => true,
         'checkDisposableEmail' => true,
+        'checkDisposableEmail' => false,
         'bannedList' => $bannedDomainList,
         'disposableList' => $customDisposableEmailList,
     ];

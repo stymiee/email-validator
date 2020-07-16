@@ -56,11 +56,13 @@ class DisposableEmailValidator extends AValidator
     public function getDisposableEmailList(): array
     {
         $providers = [];
-        foreach (self::$disposableEmailListProviders as $provider) {
-            if (filter_var($provider['url'], FILTER_VALIDATE_URL)) {
-                $content = @file_get_contents($provider['url']);
-                if ($content) {
-                    $providers[] = $this->getExternalList($content, $provider['format']);
+        if (!$this->policy->checkDisposableLocalListOnly()) {
+            foreach (self::$disposableEmailListProviders as $provider) {
+                if (filter_var($provider['url'], FILTER_VALIDATE_URL)) {
+                    $content = @file_get_contents($provider['url']);
+                    if ($content) {
+                        $providers[] = $this->getExternalList($content, $provider['format']);
+                    }
                 }
             }
         }
@@ -74,7 +76,7 @@ class DisposableEmailValidator extends AValidator
      * @param string $type
      * @return array
      */
-    public function getExternalList(string $content, string $type): array
+    private function getExternalList(string $content, string $type): array
     {
         switch ($type) {
             case 'json':
