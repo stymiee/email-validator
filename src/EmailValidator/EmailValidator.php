@@ -7,6 +7,7 @@ namespace EmailValidator;
 use EmailValidator\Validator\BannedListValidator;
 use EmailValidator\Validator\BasicValidator;
 use EmailValidator\Validator\DisposableEmailValidator;
+use EmailValidator\Validator\FreeEmailValidator;
 use EmailValidator\Validator\MxValidator;
 
 class EmailValidator
@@ -20,6 +21,8 @@ class EmailValidator
     public const FAIL_BANNED_DOMAIN = 3;
 
     public const FAIL_DISPOSABLE_DOMAIN = 4;
+
+    public const FAIL_FREE_PROVIDER = 5;
 
     /**
      * @var BasicValidator
@@ -42,6 +45,11 @@ class EmailValidator
     private $disposableEmailValidator;
 
     /**
+     * @var FreeEmailValidator
+     */
+    private $freeEmailValidator;
+
+    /**
      * @var int
      */
     private $reason;
@@ -56,6 +64,7 @@ class EmailValidator
         $this->basicValidator = new BasicValidator($policy);
         $this->bannedListValidator = new BannedListValidator($policy);
         $this->disposableEmailValidator = new DisposableEmailValidator($policy);
+        $this->freeEmailValidator = new FreeEmailValidator($policy);
     }
 
     /**
@@ -76,6 +85,8 @@ class EmailValidator
             $this->reason = self::FAIL_BANNED_DOMAIN;
         } elseif (!$this->disposableEmailValidator->validate($emailAddress)) {
             $this->reason = self::FAIL_DISPOSABLE_DOMAIN;
+        } elseif (!$this->freeEmailValidator->validate($emailAddress)) {
+            $this->reason = self::FAIL_FREE_PROVIDER;
         }
 
         return $this->reason === self::NO_ERROR;
@@ -100,6 +111,9 @@ class EmailValidator
                 break;
             case self::FAIL_DISPOSABLE_DOMAIN:
                 $msg = 'Domain is used by disposable email providers';
+                break;
+            case self::FAIL_FREE_PROVIDER:
+                $msg = 'Domain is used by free email providers';
                 break;
             default:
                 $msg = '';

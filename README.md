@@ -5,18 +5,19 @@ The PHP Email Validator will validate an email address for all or some of the fo
 - is in a valid format
 - has configured MX records (optional)
 - is not a disposable email address (optional)
+- is not a free email account (optional)
 - is not a banned email domain (optional)
 
 The Email Validator is configurable, so you have full control over how much validation will occur.
 
 ## Requirements
 
-- PHP 7.2+
+- PHP 7.2 or newer
 
 ## Installation
 
-Simply add a dependency on `stymiee/email-validator` to your project's `composer.json` file if you 
-use [Composer](http://getcomposer.org/) to manage the dependencies of your project.
+Simply add a dependency on `stymiee/email-validator` to your project's `composer.json` file if you use
+[Composer](https://getcomposer.org/) to manage the dependencies of your project.
 
 Here is a minimal example of a `composer.json` file that just defines a dependency on PHP Simple Encryption:
 
@@ -29,8 +30,8 @@ Here is a minimal example of a `composer.json` file that just defines a dependen
 ## Functional Description
 
 The Email Validator library builds upon PHP's built in `filter_var($emailAddress, FILTER_VALIDATE_EMAIL);` by adding a 
-default MX record check. It also offers additional validation against disposable email addresses and a custom banned
-domain list.
+default MX record check. It also offers additional validation against disposable email addresses, free email address 
+providers, and a custom banned domain list.
 
 ### Validate MX 
 
@@ -44,6 +45,16 @@ Many users who are abusing a system, or not using that system as intended, can u
 provides a short-lived (approximately 10 minutes) email address to be used for registrations or user confirmations. If
 `checkDisposableEmail` is set to `true` in the configuration (see below) the domain name will be validated to ensure 
 it is not associated with a disposable email address provider. 
+
+You can add you own domains to this list if you find the public list providers do not have one you
+have identified in their lists. Examples are provided in the `examples` directory which demonstrate how to do this.
+
+### Restrict Free Email Address Providers
+
+Many users who are abusing a system, or not using that system as intended, can use a free email service who 
+provides a free email address which is immediately available to be used for registrations or user confirmations. If
+`checkFreeEmail` is set to `true` in the configuration (see below) the domain name will be validated to ensure 
+it is not associated with a free email address provider. 
 
 You can add you own domains to this list if you find the public list providers do not have one you
 have identified in their lists. Examples are provided in the `examples` directory which demonstrate how to do this.
@@ -71,6 +82,10 @@ A boolean value that enables/disables banned domain validation. Disabled by defa
 
 A boolean value that enables/disables disposable email address validation. Disabled by default.
 
+#### checkFreeEmail
+
+A boolean value that enables/disables free email address provider validation. Disabled by default.
+
 #### localDisposableOnly
 
 A boolean value that when set to `true` will not retrieve third party disposable email provider lists. Use this if you 
@@ -84,13 +99,17 @@ An array of domains that are not allowed to be used for email addresses.
 
 An array of domains that are suspected disposable email address providers.
 
+#### freeList
+
+An array of domains that are free email address providers.
+
 **Example**
 
     $config = [
         'checkMxRecords' => true,
         'checkBannedListedEmail' => true,
         'checkDisposableEmail' => true,
-        'checkDisposableEmail' => false,
+        'checkFreeEmail' => true,
         'bannedList' => $bannedDomainList,
         'disposableList' => $customDisposableEmailList,
     ];
@@ -112,6 +131,7 @@ An array of domains that are suspected disposable email address providers.
     ];
     
     $testEmailAddresses = [
+        'test@johnconde.net',
         'test@gmail.com',
         'test@hotmail.com',
         'test@outlook.com',
@@ -128,6 +148,7 @@ An array of domains that are suspected disposable email address providers.
         'checkMxRecords' => true,
         'checkBannedListedEmail' => true,
         'checkDisposableEmail' => true,
+        'checkFreeEmail' => true,
         'bannedList' => $bannedDomainList,
         'disposableList' => $customDisposableEmailList,
     ];
@@ -142,16 +163,17 @@ An array of domains that are suspected disposable email address providers.
 **Output**
 
     Email is valid
-    Email is valid
-    Email is valid
-    Email is valid
+    Domain is used by free email providers
+    Domain is used by free email providers
+    Domain is used by free email providers
+    Domain is used by free email providers
     Domain is banned
+    Domain is used by disposable email providers
+    Domain is used by disposable email providers
     Domain does not accept email
     Domain is used by disposable email providers
     Domain is used by disposable email providers
-    Domain is used by disposable email providers
-    Domain is used by disposable email providers    
-  
+ 
 ## Notes
 
 The email address is checked against a list of known disposable email address providers which are aggregated from
