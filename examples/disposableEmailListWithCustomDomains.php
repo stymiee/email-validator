@@ -26,7 +26,7 @@ $config = [
 ];
 $emailValidator = new EmailValidator($config);
 
-foreach($testEmailAddresses as $emailAddress) {
+foreach ($testEmailAddresses as $emailAddress) {
     $emailIsValid = $emailValidator->validate($emailAddress);
     echo  ($emailIsValid) ? 'Email is valid' : $emailValidator->getErrorReason();
     echo PHP_EOL;
