@@ -91,6 +91,11 @@ A boolean value that enables/disables free email address provider validation. Di
 A boolean value that when set to `true` will not retrieve third party disposable email provider lists. Use this if you 
 cache the list of providers locally which is useful when performance matters. Disabled by default.
 
+#### LocalFreeOnly
+
+A boolean value that when set to `true` will not retrieve third party free email provider lists. Use this if you 
+cache the list of providers locally which is useful when performance matters. Disabled by default.
+
 #### bannedList
 
 An array of domains that are not allowed to be used for email addresses.
