@@ -1,6 +1,6 @@
 <?php
 
-use EmailValidator\EmailValidator;
+namespace EmailValidator;
 
 require('../vendor/autoload.php');
 
@@ -12,6 +12,10 @@ $bannedDomainList = [
     'domain.com',
 ];
 
+$customFreeEmailList = [
+    'example2.com',
+];
+
 $testEmailAddresses = [
     'test@johnconde.net',
     'test@gmail.com',
@@ -20,6 +24,7 @@ $testEmailAddresses = [
     'test@yahoo.com',
     'test@domain.com',
     'test@example.com',
+    'test@example2.com',
     'test@nobugmail.com',
     'test@mxfuel.com',
     'test@cellurl.com',
@@ -33,6 +38,7 @@ $config = [
     'checkFreeEmail' => true,
     'bannedList' => $bannedDomainList,
     'disposableList' => $customDisposableEmailList,
+    'freeList' => $customFreeEmailList,
 ];
 $emailValidator = new EmailValidator($config);
 
