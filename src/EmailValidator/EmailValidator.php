@@ -115,6 +115,7 @@ class EmailValidator
             case self::FAIL_FREE_PROVIDER:
                 $msg = 'Domain is used by free email providers';
                 break;
+            case self::NO_ERROR:
             default:
                 $msg = '';
         }
