@@ -117,6 +117,7 @@ An array of domains that are free email address providers.
         'checkFreeEmail' => true,
         'bannedList' => $bannedDomainList,
         'disposableList' => $customDisposableEmailList,
+        'freeList' => $customFreeEmailList,
     ];
     $emailValidator = new EmailValidator($config);
 
@@ -130,11 +131,12 @@ An array of domains that are free email address providers.
     $customDisposableEmailList = [
         'example.com',
     ];
-    
+    $customFreeEmailList = [
+        'example2.com',
+    ];
     $bannedDomainList = [
         'domain.com',
     ];
-    
     $testEmailAddresses = [
         'test@johnconde.net',
         'test@gmail.com',
@@ -144,6 +146,7 @@ An array of domains that are free email address providers.
         'test@domain.com',
         'test@mxfuel.com',
         'test@example.com',
+        'test@example2.com',
         'test@nobugmail.com',
         'test@cellurl.com',
         'test@10minutemail.com',
@@ -156,6 +159,7 @@ An array of domains that are free email address providers.
         'checkFreeEmail' => true,
         'bannedList' => $bannedDomainList,
         'disposableList' => $customDisposableEmailList,
+        'freeList' => $customFreeEmailList,
     ];
     $emailValidator = new EmailValidator($config);
     
@@ -174,6 +178,7 @@ An array of domains that are free email address providers.
     Domain is used by free email providers
     Domain is banned
     Domain is used by disposable email providers
+    Domain is used by free email providers
     Domain is used by disposable email providers
     Domain does not accept email
     Domain is used by disposable email providers
