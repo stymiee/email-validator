@@ -24,5 +24,5 @@ A good question will include all the following:
 
 ## Useful Links
 
-- [Going Deeper Into Email Address Validation](https://www.johnconde.net/blog/going-deeper-int…dress-validation/) (article)
+- [Going Deeper Into Email Address Validation](https://www.johnconde.net/blog/going-deeper-into-email-address-validation/) (article)
 - [Tutorial: PHP Email Address Validator](https://www.johnconde.net/blog/tutorial-php-ema…ddress-validator/)
