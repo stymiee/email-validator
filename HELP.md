@@ -17,10 +17,12 @@ and I will not be able to assist you.
 A good question will include all the following:
 - A description of the problem (what are you trying to do? what results are you expecting? what results are you actually getting?)
 - The code you are using (only post the relevant code)
-- Your unencrypted text
-- The key you are using
-- The IV you are using (if applicable)
 - The output of your method call(s)
 - Any error message(s) you are getting
 
 **Do not use Stack Overflow to report bugs.** Bugs may be reported [here](https://github.com/stymiee/email-validator/issues/new).
+
+## Useful Links
+
+- [Going Deeper Into Email Address Validation](https://www.johnconde.net/blog/going-deeper-int…dress-validation/) (article)
+- [Tutorial: PHP Email Address Validator](https://www.johnconde.net/blog/tutorial-php-ema…ddress-validator/)
