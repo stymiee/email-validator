@@ -13,6 +13,9 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    with:
+        php-version: '7.2'
+
     steps:
     - uses: actions/checkout@v2
 
