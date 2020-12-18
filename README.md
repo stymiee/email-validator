@@ -1,6 +1,6 @@
 [![Latest Stable Version](https://poser.pugx.org/stymiee/email-validator/v/stable.svg)](https://packagist.org/packages/stymiee/email-validator)
 [![Total Downloads](https://poser.pugx.org/stymiee/email-validator/downloads)](https://packagist.org/packages/stymiee/email-validator)
-![PHP Composer](https://github.com/stymiee/email-validator/workflows/PHP%20Composer/badge.svg?branch=master)
+![Build](https://github.com/stymiee/email-validator/workflows/PHP%20Composer/badge.svg?branch=master)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/stymiee/email-validator/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/stymiee/email-validator/?branch=master)
 [![Maintainability](https://api.codeclimate.com/v1/badges/3b45bd94f090378ac5c6/maintainability)](https://codeclimate.com/github/stymiee/email-validator/maintainability)
 [![License](https://poser.pugx.org/stymiee/email-validator/license)](https://packagist.org/packages/stymiee/email-validator)
@@ -172,7 +172,7 @@ An array of domains that are free email address providers.
     
     foreach($testEmailAddresses as $emailAddress) {
         $emailIsValid = $emailValidator->validate($emailAddress);
-        echo  ($emailIsValid) ? 'Email is valid' : $emailValidator->getErrorReason();
+        echo ($emailIsValid) ? 'Email is valid' : $emailValidator->getErrorReason();
         echo PHP_EOL;
     }
     
