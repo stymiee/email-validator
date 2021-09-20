@@ -93,6 +93,18 @@ class EmailValidator
     }
 
     /**
+     * Returns the error code constant value for invalid email addresses.
+     *
+     * For use by integrating systems to create their own error messages.
+     *
+     * @return int
+     */
+    public function getErrorCode(): int
+    {
+        return $this->reason;
+    }
+
+    /**
      * Returns an error message for invalid email addresses
      *
      * @return string
