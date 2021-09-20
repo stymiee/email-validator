@@ -97,6 +97,7 @@ class EmailValidator
      *
      * For use by integrating systems to create their own error messages.
      *
+     * @since 1.0.1
      * @return int
      */
     public function getErrorCode(): int
