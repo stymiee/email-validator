@@ -56,8 +56,6 @@ class EmailValidator
 
     public function __construct(array $config = [])
     {
-        $this->reason = self::NO_ERROR;
-
         $policy = new Policy($config);
 
         $this->mxValidator = new MxValidator($policy);
@@ -75,6 +73,8 @@ class EmailValidator
      */
     public function validate(string $email): bool
     {
+        $this->resetErrorCode();
+
         $emailAddress = new EmailAddress($email);
 
         if (!$this->basicValidator->validate($emailAddress)) {
@@ -134,5 +134,16 @@ class EmailValidator
         }
 
         return $msg;
+    }
+
+    /**
+     * Resets the error code so each validation starts off defaulting to "valid"
+     *
+     * @since 1.0.2
+     * @return void
+     */
+    private function resetErrorCode(): void
+    {
+        $this->reason = self::NO_ERROR;
     }
 }

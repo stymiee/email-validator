@@ -17,16 +17,17 @@ $customFreeEmailList = [
 ];
 
 $testEmailAddresses = [
+    'test@domain.com',
     'test@johnconde.net',
     'test@gmail.com',
     'test@hotmail.com',
     'test@outlook.com',
     'test@yahoo.com',
     'test@domain.com',
+    'test@mxfuel.com',
     'test@example.com',
     'test@example2.com',
     'test@nobugmail.com',
-    'test@mxfuel.com',
     'test@cellurl.com',
     'test@10minutemail.com',
 ];
