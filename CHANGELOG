@@ -1,6 +1,6 @@
 VERSION 1.1.2 - 2022-10-11
 -----------------------------------------------------------------------------------------------------------------------
-Changed banned domain check to use pattern matching for more robust validation
+Changed banned domain check to use pattern matching for more robust validation including subdomains
 
 
 VERSION 1.1.1 - 2022-02-22
