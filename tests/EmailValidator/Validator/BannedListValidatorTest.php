@@ -21,6 +21,7 @@ class BannedListValidatorTest extends TestCase
             [$bannedList, 'user@example.com', false, true],
             [$bannedList, 'user@gmail.com'  , false, true],
             [$bannedList, 'user@test.example.com', true, false],
+            [$bannedList, 'user@', true, true],
         ];
     }
 
