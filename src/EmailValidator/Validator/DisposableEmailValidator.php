@@ -17,10 +17,6 @@ class DisposableEmailValidator extends AProviderValidator
             'url' => 'https://raw.githubusercontent.com/martenson/disposable-email-domains/master/disposable_email_blocklist.conf'
         ],
         [
-            'format' => 'txt',
-            'url' => 'https://gist.githubusercontent.com/michenriksen/8710649/raw/e09ee253960ec1ff0add4f92b62616ebbe24ab87/disposable-email-provider-domains'
-        ],
-        [
             'format' => 'json',
             'url' => 'https://raw.githubusercontent.com/ivolo/disposable-email-domains/master/wildcard.json'
         ],
