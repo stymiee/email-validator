@@ -8,14 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.1.4] - 2024-XX-XX
 
 ### Changed
-- Issue #6: `googlemail.com` is now recognized as a Gmail address
-- Issue #6: `.` are now removed when sanitizing Gmail addresses (to get to the root email address)
-
 - CHANGELOG format
 
 ### Fixed
+- Issue #5: Static variables prevents running validation with different configurations
+- Issue #6: `googlemail.com` is now recognized as a Gmail address
+- Issue #6: `.` are now removed when sanitizing Gmail addresses (to get to the root email address)
 
-- Issue #6: `googlemail.com` is now considered a Gmail email address
 
 ## [1.1.3] - 2022-10-12
 
