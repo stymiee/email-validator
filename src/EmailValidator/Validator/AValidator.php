@@ -12,7 +12,7 @@ abstract class AValidator implements IValidator
     /**
      * @var Policy
      */
-    protected $policy;
+    protected Policy $policy;
 
     public function __construct(Policy $policy)
     {

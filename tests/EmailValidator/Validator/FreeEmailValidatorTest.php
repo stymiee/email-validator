@@ -34,4 +34,38 @@ class FreeEmailValidatorTest extends TestCase
         $validator = new FreeEmailValidator(new Policy($policy));
         self::assertFalse($validator->validate(new EmailAddress('user@example.com')));
     }
+
+    public function testValidateInvalidEmail(): void
+    {
+        $policy = [
+            'checkFreeEmail' => true,
+            'freeList' => [
+                'example.com'
+            ],
+        ];
+        $validator = new FreeEmailValidator(new Policy($policy));
+        self::assertTrue($validator->validate(new EmailAddress('invalid-email')));
+    }
+
+    public function testValidateEmptyDomain(): void
+    {
+        $policy = [
+            'checkFreeEmail' => true,
+            'freeList' => [
+                'example.com'
+            ],
+        ];
+        $validator = new FreeEmailValidator(new Policy($policy));
+        self::assertTrue($validator->validate(new EmailAddress('user@')));
+    }
+
+    public function testValidateWithEmptyList(): void
+    {
+        $policy = [
+            'checkFreeEmail' => true,
+            'freeList' => [],
+        ];
+        $validator = new FreeEmailValidator(new Policy($policy));
+        self::assertTrue($validator->validate(new EmailAddress('user@example.com')));
+    }
 }

@@ -58,7 +58,7 @@ class EmailValidator
      * @var EmailAddress
      * @since 1.1.0
      */
-    private $emailAddress;
+    private $emailAddress = null;
 
     public function __construct(array $config = [])
     {
@@ -164,7 +164,7 @@ class EmailValidator
      */
     public function isGmailWithPlusChar(): bool
     {
-        return $this->emailAddress->isGmailWithPlusChar();
+        return $this->emailAddress !== null && $this->emailAddress->isGmailWithPlusChar();
     }
 
     /**
@@ -176,6 +176,9 @@ class EmailValidator
      */
     public function getGmailAddressWithoutPlus(): string
     {
+        if ($this->emailAddress === null) {
+            return '';
+        }
         return $this->emailAddress->getGmailAddressWithoutPlus();
     }
 }

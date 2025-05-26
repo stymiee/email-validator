@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- Strict type declarations for all properties and method signatures.
+- Improved type safety with PHP 7.4+ typed properties and enhanced PHPDoc array type hints.
+- Refactored provider validators to handle null/invalid domains gracefully and consistently return true for invalid emails.
+- Expanded unit tests to cover edge cases, type safety, and invalid input handling.
+
+### Changed
+- Refactored internal logic for better null safety and array filtering.
+- Updated the minimum PHP version requirement to PHP 7.4.
+
+### Fixed
+- No breaking changes to the public API; all existing integrations remain compatible.
+- All tests passing.
+
 ## [1.1.4] - 2024-04-09
 
 ### Changed

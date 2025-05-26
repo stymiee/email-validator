@@ -20,7 +20,7 @@ The Email Validator is configurable, so you have full control over how much vali
 
 ## Requirements
 
-- PHP 7.2 or newer
+- PHP 7.4 or newer
 
 ## Installation
 

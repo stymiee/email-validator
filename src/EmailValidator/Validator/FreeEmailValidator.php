@@ -9,14 +9,14 @@ use EmailValidator\EmailAddress;
 class FreeEmailValidator extends AProviderValidator
 {
     /**
-     * @var array Array of client-provided free email providers.
+     * @var array<string> Array of client-provided free email providers.
      */
-    protected $freeEmailListProviders = [];
+    protected array $freeEmailListProviders = [];
 
     /**
-     * @var array Array of URLs containing a list of free email addresses and the format of that list.
+     * @var array<array{format: string, url: string}> Array of URLs containing a list of free email addresses and the format of that list.
      */
-    protected static $providers = [
+    protected static array $providers = [
         [
             'format' => 'txt',
             'url' => 'https://gist.githubusercontent.com/tbrianjones/5992856/raw/93213efb652749e226e69884d6c048e595c1280a/free_email_provider_domains.txt'
@@ -32,17 +32,22 @@ class FreeEmailValidator extends AProviderValidator
      */
     public function validate(EmailAddress $email): bool
     {
-        $valid = true;
-        if ($this->policy->checkFreeEmail()) {
-            if ($this->freeEmailListProviders === []) {
-                $this->freeEmailListProviders = $this->getList(
-                    $this->policy->checkFreeLocalListOnly(),
-                    $this->policy->getFreeList()
-                );
-            }
-            $domain = $email->getDomain();
-            $valid = !in_array($domain, $this->freeEmailListProviders, true);
+        if (!$this->policy->checkFreeEmail()) {
+            return true;
         }
-        return $valid;
+
+        if ($this->freeEmailListProviders === []) {
+            $this->freeEmailListProviders = $this->getList(
+                $this->policy->checkFreeLocalListOnly(),
+                $this->policy->getFreeList()
+            );
+        }
+
+        $domain = $email->getDomain();
+        if ($domain === null) {
+            return true;
+        }
+
+        return !in_array($domain, $this->freeEmailListProviders, true);
     }
 }

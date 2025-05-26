@@ -33,4 +33,34 @@ class ProviderValidatorTest extends TestCase
         $domains = ['example.com', 'test.com'];
         self::assertEquals($domains, $reflectionMethod->invoke($provider, implode("\r\n", $domains), 'txt'));
     }
+
+    public function testGetExternalListInvalidJson(): void
+    {
+        $provider = new FreeEmailValidator(new Policy());
+        $reflectionMethod = new \ReflectionMethod($provider, 'getExternalList');
+        $reflectionMethod->setAccessible(true);
+
+        self::assertEquals([], $reflectionMethod->invoke($provider, 'invalid json', 'json'));
+    }
+
+    public function testGetExternalListMixedTypes(): void
+    {
+        $provider = new FreeEmailValidator(new Policy());
+        $reflectionMethod = new \ReflectionMethod($provider, 'getExternalList');
+        $reflectionMethod->setAccessible(true);
+
+        $mixedData = ['example.com', 123, true, null, 'test.com'];
+        $expected = ['example.com', 'test.com'];
+        self::assertEquals($expected, $reflectionMethod->invoke($provider, json_encode($mixedData), 'json'));
+    }
+
+    public function testGetExternalListEmptyContent(): void
+    {
+        $provider = new FreeEmailValidator(new Policy());
+        $reflectionMethod = new \ReflectionMethod($provider, 'getExternalList');
+        $reflectionMethod->setAccessible(true);
+
+        self::assertEquals([], $reflectionMethod->invoke($provider, '', 'txt'));
+        self::assertEquals([], $reflectionMethod->invoke($provider, '', 'json'));
+    }
 }

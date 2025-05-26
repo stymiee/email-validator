@@ -9,7 +9,7 @@ class EmailAddress
     /**
      * @var string
      */
-    private $email;
+    private string $email;
 
     public function __construct(string $email)
     {
@@ -40,9 +40,9 @@ class EmailAddress
      * Returns the username of the email address.
      *
      * @since 1.1.0
-     * @return string|null
+     * @return string
      */
-    private function getUsername(): ?string
+    private function getUsername(): string
     {
         return explode('@', $this->email)[0] ?? '';
     }

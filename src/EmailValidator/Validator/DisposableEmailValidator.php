@@ -9,14 +9,14 @@ use EmailValidator\EmailAddress;
 class DisposableEmailValidator extends AProviderValidator
 {
     /**
-     * @var array Array of client-provided disposable email providers.
+     * @var array<string> Array of client-provided disposable email providers.
      */
-    protected $disposableEmailListProviders = [];
+    protected array $disposableEmailListProviders = [];
 
     /**
-     * @var array Array of URLs containing a list of disposable email addresses and the format of that list.
+     * @var array<array{format: string, url: string}> Array of URLs containing a list of disposable email addresses and the format of that list.
      */
-    protected static $providers = [
+    protected static array $providers = [
         [
             'format' => 'txt',
             'url' => 'https://raw.githubusercontent.com/martenson/disposable-email-domains/master/disposable_email_blocklist.conf'
@@ -36,17 +36,22 @@ class DisposableEmailValidator extends AProviderValidator
      */
     public function validate(EmailAddress $email): bool
     {
-        $valid = true;
-        if ($this->policy->checkDisposableEmail()) {
-            if ($this->disposableEmailListProviders === []) {
-                $this->disposableEmailListProviders = $this->getList(
-                    $this->policy->checkDisposableLocalListOnly(),
-                    $this->policy->getDisposableList()
-                );
-            }
-            $domain = $email->getDomain();
-            $valid = !in_array($domain, $this->disposableEmailListProviders, true);
+        if (!$this->policy->checkDisposableEmail()) {
+            return true;
         }
-        return $valid;
+
+        if ($this->disposableEmailListProviders === []) {
+            $this->disposableEmailListProviders = $this->getList(
+                $this->policy->checkDisposableLocalListOnly(),
+                $this->policy->getDisposableList()
+            );
+        }
+
+        $domain = $email->getDomain();
+        if ($domain === null) {
+            return true;
+        }
+
+        return !in_array($domain, $this->disposableEmailListProviders, true);
     }
 }
