@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Improved type safety with PHP 7.4+ typed properties and enhanced PHPDoc array type hints.
 - Refactored provider validators to handle null/invalid domains gracefully and consistently return true for invalid emails.
 - Expanded unit tests to cover edge cases, type safety, and invalid input handling.
+- Added support for custom validators through the new `registerValidator()` method.
+- Added new error code `FAIL_CUSTOM` for custom validation failures.
 
 ### Changed
 - Refactored internal logic for better null safety and array filtering.

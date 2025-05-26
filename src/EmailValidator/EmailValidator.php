@@ -24,6 +24,8 @@ class EmailValidator
 
     public const FAIL_FREE_PROVIDER = 5;
 
+    public const FAIL_CUSTOM = 6;
+
     /**
      * @var BasicValidator
      */
@@ -50,6 +52,12 @@ class EmailValidator
     private $freeEmailValidator;
 
     /**
+     * @var array<AValidator>
+     * @since 2.0.0
+     */
+    private array $customValidators = [];
+
+    /**
      * @var int
      */
     private $reason;
@@ -74,6 +82,18 @@ class EmailValidator
     }
 
     /**
+     * Register a custom validator
+     *
+     * @param \EmailValidator\Validator\AValidator $validator
+     * @return void
+     * @since 2.0.0
+     */
+    public function registerValidator(\EmailValidator\Validator\AValidator $validator): void
+    {
+        $this->customValidators[] = $validator;
+    }
+
+    /**
      * Validate an email address by the rules set forth in the Policy
      *
      * @param string $email
@@ -95,6 +115,13 @@ class EmailValidator
             $this->reason = self::FAIL_DISPOSABLE_DOMAIN;
         } elseif (!$this->freeEmailValidator->validate($this->emailAddress)) {
             $this->reason = self::FAIL_FREE_PROVIDER;
+        } else {
+            foreach ($this->customValidators as $validator) {
+                if (!$validator->validate($this->emailAddress)) {
+                    $this->reason = self::FAIL_CUSTOM;
+                    break;
+                }
+            }
         }
 
         return $this->reason === self::NO_ERROR;
@@ -135,6 +162,9 @@ class EmailValidator
                 break;
             case self::FAIL_FREE_PROVIDER:
                 $msg = 'Domain is used by free email providers';
+                break;
+            case self::FAIL_CUSTOM:
+                $msg = 'Failed custom validation';
                 break;
             case self::NO_ERROR:
             default:

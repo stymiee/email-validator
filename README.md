@@ -20,7 +20,7 @@ The Email Validator is configurable, so you have full control over how much vali
 
 ## Requirements
 
-- PHP 7.4 or newer
+- PHP 7.4 or newer (v1.1.4 will work with PHP 7.2 or newer)
 
 ## Installation
 
@@ -31,7 +31,7 @@ Here is a minimal example of a `composer.json` file that just defines a dependen
 ```json
 {
     "require": {
-        "stymiee/email-validator": "^1"
+        "stymiee/email-validator": "^2"
     }
 }
 ```
@@ -226,3 +226,47 @@ the address.
 
 If you require assistance using this library start by viewing the [HELP.md](HELP.md) file included in this package. It 
 includes common problems and solutions as well how to ask for additional assistance.
+
+## Custom Validators
+
+You can create your own custom validators by extending the `AValidator` class. Here's an example:
+
+```php
+use EmailValidator\Validator\AValidator;
+use EmailValidator\EmailAddress;
+use EmailValidator\Policy;
+
+class MyCustomValidator extends AValidator
+{
+    public function validate(EmailAddress $email): bool
+    {
+        // Your custom validation logic here
+        return $email->getDomain() === 'example.com';
+    }
+}
+
+// Register your custom validator
+$emailValidator = new EmailValidator();
+$emailValidator->registerValidator(new MyCustomValidator(new Policy()));
+
+// Use it like any other validator
+$isValid = $emailValidator->validate('user@example.com');
+```
+
+Custom validators will be run after all built-in validators. If a custom validator fails, the error code will be set to `EmailValidator::FAIL_CUSTOM` and the error message will be "Failed custom validation".
+
+### Example Use Cases
+
+- Domain-specific validation rules
+- Custom business logic for email validation
+- Integration with external services
+- Special character restrictions
+- Custom format requirements
+
+### Best Practices
+
+1. Keep your validation logic focused and single-purpose
+2. Use the Policy class to make your validator configurable
+3. Handle null domains and invalid emails gracefully
+4. Add appropriate unit tests for your custom validator
+5. Document your validator's requirements and behavior
