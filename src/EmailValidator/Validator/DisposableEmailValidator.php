@@ -6,15 +6,26 @@ namespace EmailValidator\Validator;
 
 use EmailValidator\EmailAddress;
 
+/**
+ * Validates email addresses against known disposable email providers
+ *
+ * This validator checks if an email address is from a known disposable email provider.
+ * It maintains a list of disposable email domains from multiple sources and can be
+ * configured to use only local lists or fetch from remote sources.
+ */
 class DisposableEmailValidator extends AProviderValidator
 {
     /**
-     * @var array<string> Array of client-provided disposable email providers.
+     * Array of client-provided disposable email providers
+     *
+     * @var array<string> Array of client-provided disposable email providers
      */
     protected array $disposableEmailListProviders = [];
 
     /**
-     * @var array<array{format: string, url: string}> Array of URLs containing a list of disposable email addresses and the format of that list.
+     * Array of URLs containing lists of disposable email addresses and their formats
+     *
+     * @var array<array{format: string, url: string}> Array of URLs containing a list of disposable email addresses and the format of that list
      */
     protected static array $providers = [
         [
@@ -28,11 +39,13 @@ class DisposableEmailValidator extends AProviderValidator
     ];
 
     /**
-     * Checks to see if validating against disposable domains is enabled. If so, gets the list of disposable domains
+     * Validates an email address against known disposable email providers
+     *
+     * Checks if validating against disposable domains is enabled. If so, gets the list of disposable domains
      * and checks if the domain is one of them.
      *
-     * @param EmailAddress $email
-     * @return bool
+     * @param EmailAddress $email The email address to validate
+     * @return bool True if the domain is not a disposable email provider or validation is disabled, false if it is a disposable provider
      */
     public function validate(EmailAddress $email): bool
     {

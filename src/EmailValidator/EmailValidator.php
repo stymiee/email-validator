@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace EmailValidator;
 
+use EmailValidator\Validator\AValidator;
 use EmailValidator\Validator\BannedListValidator;
 use EmailValidator\Validator\BasicValidator;
 use EmailValidator\Validator\DisposableEmailValidator;
@@ -84,11 +85,11 @@ class EmailValidator
     /**
      * Register a custom validator
      *
-     * @param \EmailValidator\Validator\AValidator $validator
+     * @param AValidator $validator
      * @return void
      * @since 2.0.0
      */
-    public function registerValidator(\EmailValidator\Validator\AValidator $validator): void
+    public function registerValidator(AValidator $validator): void
     {
         $this->customValidators[] = $validator;
     }
