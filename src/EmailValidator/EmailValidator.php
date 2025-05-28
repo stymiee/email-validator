@@ -9,6 +9,7 @@ use EmailValidator\Validator\BannedListValidator;
 use EmailValidator\Validator\BasicValidator;
 use EmailValidator\Validator\DisposableEmailValidator;
 use EmailValidator\Validator\FreeEmailValidator;
+use EmailValidator\Validator\GmailValidator;
 use EmailValidator\Validator\MxValidator;
 
 class EmailValidator
@@ -53,6 +54,11 @@ class EmailValidator
     private $freeEmailValidator;
 
     /**
+     * @var GmailValidator
+     */
+    private $gmailValidator;
+
+    /**
      * @var array<AValidator>
      * @since 2.0.0
      */
@@ -80,6 +86,7 @@ class EmailValidator
         $this->bannedListValidator = new BannedListValidator($policy);
         $this->disposableEmailValidator = new DisposableEmailValidator($policy);
         $this->freeEmailValidator = new FreeEmailValidator($policy);
+        $this->gmailValidator = new GmailValidator($policy);
     }
 
     /**
@@ -195,7 +202,7 @@ class EmailValidator
      */
     public function isGmailWithPlusChar(): bool
     {
-        return $this->emailAddress !== null && $this->emailAddress->isGmailWithPlusChar();
+        return $this->emailAddress !== null && $this->gmailValidator->isGmailWithPlusChar($this->emailAddress);
     }
 
     /**
@@ -210,6 +217,21 @@ class EmailValidator
         if ($this->emailAddress === null) {
             return '';
         }
-        return $this->emailAddress->getGmailAddressWithoutPlus();
+        return $this->gmailValidator->getGmailAddressWithoutPlus($this->emailAddress);
+    }
+
+    /**
+     * Returns a sanitized gmail address (plus trick removed and dots removed).
+     *
+     * @codeCoverageIgnore
+     * @since 1.1.4
+     * @return string
+     */
+    public function getSanitizedGmailAddress(): string
+    {
+        if ($this->emailAddress === null) {
+            return '';
+        }
+        return $this->gmailValidator->getSanitizedGmailAddress($this->emailAddress);
     }
 }
