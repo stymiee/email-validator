@@ -22,7 +22,7 @@ class Policy
     private bool $checkFreeEmail;
 
     /**
-     * @var array
+     * @var array<string>
      */
     private array $bannedList;
 
@@ -32,12 +32,12 @@ class Policy
     private bool $checkMxRecords;
 
     /**
-     * @var array|mixed
+     * @var array<string>
      */
     private array $disposableList;
 
     /**
-     * @var array|mixed
+     * @var array<string>
      */
     private array $freeList;
 

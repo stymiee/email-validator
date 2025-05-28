@@ -31,32 +31,32 @@ class EmailValidator
     /**
      * @var BasicValidator
      */
-    private $basicValidator;
+    private BasicValidator $basicValidator;
 
     /**
      * @var MxValidator
      */
-    private $mxValidator;
+    private MxValidator $mxValidator;
 
     /**
      * @var BannedListValidator
      */
-    private $bannedListValidator;
+    private BannedListValidator $bannedListValidator;
 
     /**
      * @var DisposableEmailValidator
      */
-    private $disposableEmailValidator;
+    private DisposableEmailValidator $disposableEmailValidator;
 
     /**
      * @var FreeEmailValidator
      */
-    private $freeEmailValidator;
+    private FreeEmailValidator $freeEmailValidator;
 
     /**
      * @var GmailValidator
      */
-    private $gmailValidator;
+    private GmailValidator $gmailValidator;
 
     /**
      * @var array<AValidator>
@@ -67,13 +67,13 @@ class EmailValidator
     /**
      * @var int
      */
-    private $reason;
+    private int $reason;
 
     /**
-     * @var EmailAddress
+     * @var EmailAddress|null
      * @since 1.1.0
      */
-    private $emailAddress = null;
+    private ?EmailAddress $emailAddress = null;
 
     public function __construct(array $config = [])
     {

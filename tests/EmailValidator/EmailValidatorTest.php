@@ -56,7 +56,7 @@ class EmailValidatorTest extends TestCase
         $mValidator->setAccessible(true);
         $mValidator->setValue($emailValidator, $mxValidator);
 
-        $bannedValidator = $this->getMockBuilder(MxValidator::class)
+        $bannedValidator = $this->getMockBuilder(BannedListValidator::class)
             ->disableOriginalConstructor()
             ->getMock();
         $bannedValidator->method('validate')
@@ -65,7 +65,7 @@ class EmailValidatorTest extends TestCase
         $bnValidator->setAccessible(true);
         $bnValidator->setValue($emailValidator, $bannedValidator);
 
-        $disposableValidator = $this->getMockBuilder(MxValidator::class)
+        $disposableValidator = $this->getMockBuilder(DisposableEmailValidator::class)
             ->disableOriginalConstructor()
             ->getMock();
         $disposableValidator->method('validate')
@@ -74,7 +74,7 @@ class EmailValidatorTest extends TestCase
         $dValidator->setAccessible(true);
         $dValidator->setValue($emailValidator, $disposableValidator);
 
-        $freeValidator = $this->getMockBuilder(MxValidator::class)
+        $freeValidator = $this->getMockBuilder(FreeEmailValidator::class)
             ->disableOriginalConstructor()
             ->getMock();
         $freeValidator->method('validate')
