@@ -40,7 +40,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "EmailValidator\\Tests\\": "tests/EmailValidator/"
+            "EmailValidator\\": "tests/EmailValidator/"
         }
     },
     "scripts": {
