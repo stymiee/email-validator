@@ -14,7 +14,7 @@
     </logging>
     <testsuites>
         <testsuite name="unit">
-            <directory>./tests/unit/</directory>
+            <directory>./tests/EmailValidator/</directory>
         </testsuite>
     </testsuites>
     <filter>
