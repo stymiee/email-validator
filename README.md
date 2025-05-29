@@ -216,17 +216,6 @@ Domain does not accept email
 Domain is used by disposable email providers
 Domain is used by free email providers (Sanitized address: test@gmail.com)
 ```
-## Notes
-
-The email address is checked against a list of known disposable email address providers which are aggregated from
-public disposable email address provider lists. This requires making HTTP requests to get the lists when validating 
-the address.
-
-## Support
-
-If you require assistance using this library start by viewing the [HELP.md](HELP.md) file included in this package. It 
-includes common problems and solutions as well how to ask for additional assistance.
-
 ## Custom Validators
 
 You can create your own custom validators by extending the `AValidator` class. Here's an example:
@@ -263,6 +252,12 @@ Custom validators will be run after all built-in validators. If a custom validat
 - Special character restrictions
 - Custom format requirements
 
+## Notes
+
+The email address is checked against a list of known disposable email address providers which are aggregated from
+public disposable email address provider lists. This requires making HTTP requests to get the lists when validating
+the address.
+
 ### Best Practices
 
 1. Keep your validation logic focused and single-purpose
@@ -270,3 +265,8 @@ Custom validators will be run after all built-in validators. If a custom validat
 3. Handle null domains and invalid emails gracefully
 4. Add appropriate unit tests for your custom validator
 5. Document your validator's requirements and behavior
+
+## Support
+
+If you require assistance using this library start by viewing the [HELP.md](HELP.md) file included in this package. It
+includes common problems and solutions as well how to ask for additional assistance.
