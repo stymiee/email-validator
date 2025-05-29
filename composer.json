@@ -44,7 +44,7 @@
         }
     },
     "scripts": {
-        "test": "phpunit",
+        "test": "phpunit tests/EmailValidator",
         "test:coverage": "phpunit --coverage-html build/coverage",
         "phpcs": "phpcs ./src --report-file=build/phpcs/report.txt --runtime-set ignore_warnings_on_exit 1 --runtime-set ignore_errors_on_exit 1",
         "phpcs:fix": "phpcbf ./src",
