@@ -1,7 +1,8 @@
 <?php
 
-namespace EmailValidator\Validator;
+namespace EmailValidator\Tests\Validator;
 
+use EmailValidator\Validator\BasicValidator;
 use EmailValidator\EmailAddress;
 use EmailValidator\Policy;
 use PHPUnit\Framework\TestCase;

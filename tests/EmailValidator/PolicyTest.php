@@ -1,7 +1,8 @@
 <?php
 
-namespace EmailValidator;
+namespace EmailValidator\Tests;
 
+use EmailValidator\Policy;
 use PHPUnit\Framework\TestCase;
 
 class PolicyTest extends TestCase

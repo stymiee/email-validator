@@ -1,7 +1,10 @@
 <?php
 
-namespace EmailValidator;
+namespace EmailValidator\Tests;
 
+use EmailValidator\EmailAddress;
+use EmailValidator\EmailValidator;
+use EmailValidator\Policy;
 use EmailValidator\Validator\BannedListValidator;
 use EmailValidator\Validator\BasicValidator;
 use EmailValidator\Validator\DisposableEmailValidator;

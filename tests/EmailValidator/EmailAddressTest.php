@@ -1,7 +1,8 @@
 <?php
 
-namespace EmailValidator;
+namespace EmailValidator\Tests;
 
+use EmailValidator\EmailAddress;
 use PHPUnit\Framework\TestCase;
 
 class EmailAddressTest extends TestCase

@@ -1,11 +1,10 @@
 <?php
 
-namespace EmailValidator\Validator;
+namespace EmailValidator\Tests\Validator;
 
 use EmailValidator\EmailAddress;
 use EmailValidator\EmailValidator;
 use EmailValidator\Policy;
-use EmailValidator\Validator\AValidator;
 use PHPUnit\Framework\TestCase;
 
 class CustomValidatorTest extends TestCase
@@ -34,16 +33,5 @@ class CustomValidatorTest extends TestCase
         self::assertFalse($emailValidator->validate('user@gmail.com'));
         self::assertEquals(EmailValidator::FAIL_CUSTOM, $emailValidator->getErrorCode());
         self::assertEquals('Failed custom validation', $emailValidator->getErrorReason());
-    }
-}
-
-/**
- * Example custom validator that only allows example.com domains
- */
-class ExampleDotComValidator extends AValidator
-{
-    public function validate(EmailAddress $email): bool
-    {
-        return $email->getDomain() === 'example.com';
     }
 }

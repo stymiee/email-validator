@@ -38,6 +38,11 @@
             "EmailValidator\\": "src/EmailValidator/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "EmailValidator\\Tests\\": "tests/EmailValidator/"
+        }
+    },
     "scripts": {
         "test": "phpunit tests/EmailValidator",
         "test:coverage": "phpunit --coverage-html build/coverage",
