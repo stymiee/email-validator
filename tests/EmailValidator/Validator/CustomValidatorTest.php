@@ -3,7 +3,9 @@
 namespace EmailValidator\Validator;
 
 use EmailValidator\EmailAddress;
+use EmailValidator\EmailValidator;
 use EmailValidator\Policy;
+use EmailValidator\Validator\AValidator;
 use PHPUnit\Framework\TestCase;
 
 class CustomValidatorTest extends TestCase
@@ -25,12 +27,12 @@ class CustomValidatorTest extends TestCase
 
     public function testCustomValidatorWithEmailValidator(): void
     {
-        $emailValidator = new \EmailValidator\EmailValidator();
+        $emailValidator = new EmailValidator();
         $emailValidator->registerValidator(new ExampleDotComValidator(new Policy()));
-        
+
         self::assertTrue($emailValidator->validate('user@example.com'));
         self::assertFalse($emailValidator->validate('user@gmail.com'));
-        self::assertEquals(\EmailValidator\EmailValidator::FAIL_CUSTOM, $emailValidator->getErrorCode());
+        self::assertEquals(EmailValidator::FAIL_CUSTOM, $emailValidator->getErrorCode());
         self::assertEquals('Failed custom validation', $emailValidator->getErrorReason());
     }
 }
@@ -44,4 +46,4 @@ class ExampleDotComValidator extends AValidator
     {
         return $email->getDomain() === 'example.com';
     }
-} 
+}
