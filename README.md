@@ -244,6 +244,14 @@ $isValid = $emailValidator->validate('user@example.com');
 
 Custom validators will be run after all built-in validators. If a custom validator fails, the error code will be set to `EmailValidator::FAIL_CUSTOM` and the error message will be "Failed custom validation".
 
+### Best Practices
+
+1. Keep your validation logic focused and single-purpose
+2. Use the Policy class to make your validator configurable
+3. Handle null domains and invalid emails gracefully
+4. Add appropriate unit tests for your custom validator
+5. Document your validator's requirements and behavior
+
 ### Example Use Cases
 
 - Domain-specific validation rules
@@ -257,14 +265,6 @@ Custom validators will be run after all built-in validators. If a custom validat
 The email address is checked against a list of known disposable email address providers which are aggregated from
 public disposable email address provider lists. This requires making HTTP requests to get the lists when validating
 the address.
-
-### Best Practices
-
-1. Keep your validation logic focused and single-purpose
-2. Use the Policy class to make your validator configurable
-3. Handle null domains and invalid emails gracefully
-4. Add appropriate unit tests for your custom validator
-5. Document your validator's requirements and behavior
 
 ## Support
 
