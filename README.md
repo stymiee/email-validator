@@ -2,7 +2,6 @@
 [![Total Downloads](https://poser.pugx.org/stymiee/email-validator/downloads)](https://packagist.org/packages/stymiee/email-validator)
 ![Build](https://github.com/stymiee/email-validator/workflows/Build/badge.svg)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/stymiee/email-validator/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/stymiee/email-validator/?branch=master)
-[![Maintainability](https://api.codeclimate.com/v1/badges/3b45bd94f090378ac5c6/maintainability)](https://codeclimate.com/github/stymiee/email-validator/maintainability)
 [![License](https://poser.pugx.org/stymiee/email-validator/license)](https://packagist.org/packages/stymiee/email-validator)
 
 # PHP Email Validator (email-validator)
