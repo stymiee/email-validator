@@ -52,7 +52,7 @@ class Rfc5322ValidatorTest extends TestCase
             'with multiple subdomains' => ['user@one.two.three.example.com'],
             'with all allowed special chars' => ['!#$%&\'*+-/=?^_`{|}~@example.com'],
             'quoted with spaces' => ['"John Doe"@example.com'],
-            'quoted with special chars' => ['"john(comment)doe"@example.com'],
+            'quoted with special chars 2' => ['"john(comment)doe"@example.com'],
             'quoted with at symbol' => ['"user@name"@example.com'],
             'quoted with escaped backslash' => ['"john\\\\doe"@example.com'],
         ];
@@ -162,4 +162,4 @@ class Rfc5322ValidatorTest extends TestCase
             'IPv6 compressed' => ['user@[IPv6:2001:db8::1:0:0:1]'],
         ];
     }
-} 
+}

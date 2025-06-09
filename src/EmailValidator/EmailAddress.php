@@ -34,21 +34,21 @@ class EmailAddress
 
     /**
      * Parses the email address into local part and domain
-     * 
+     *
      * This method handles:
      * - Multiple @ symbols in quoted strings
      * - Domain literals (IP addresses in square brackets)
      * - Comments in email addresses
-     * 
+     *
      * @return void
      */
     private function parseEmail(): void
     {
         $email = $this->email;
-        
+
         // Extract comments while preserving their positions
         $email = $this->extractComments($email);
-        
+
         // Split on the last @ symbol
         $atPos = strrpos($email, '@');
         if ($atPos === false) {
@@ -61,7 +61,7 @@ class EmailAddress
 
     /**
      * Extracts comments from an email address while preserving their positions
-     * 
+     *
      * @param string $email The email address to process
      * @return string The email address with comments removed
      */
@@ -72,10 +72,10 @@ class EmailAddress
         $commentDepth = 0;
         $currentComment = '';
         $escaped = false;
-        
-        for ($i = 0; $i < strlen($email); $i++) {
+
+        for ($i = 0, $iMax = strlen($email); $i < $iMax; $i++) {
             $char = $email[$i];
-            
+
             if ($escaped) {
                 if ($inComment) {
                     $currentComment .= $char;
@@ -85,7 +85,7 @@ class EmailAddress
                 $escaped = false;
                 continue;
             }
-            
+
             if ($char === '\\') {
                 $escaped = true;
                 if ($inComment) {
@@ -95,7 +95,7 @@ class EmailAddress
                 }
                 continue;
             }
-            
+
             if ($char === '(') {
                 if ($inComment) {
                     $commentDepth++;
@@ -106,7 +106,7 @@ class EmailAddress
                 }
                 continue;
             }
-            
+
             if ($char === ')') {
                 if ($inComment) {
                     $commentDepth--;
@@ -122,14 +122,14 @@ class EmailAddress
                 }
                 continue;
             }
-            
+
             if ($inComment) {
                 $currentComment .= $char;
             } else {
                 $result .= $char;
             }
         }
-        
+
         return $result;
     }
 

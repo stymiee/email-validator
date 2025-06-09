@@ -23,10 +23,10 @@ class Rfc5322Validator extends AValidator
     private const MAX_LOCAL_PART_LENGTH = 64;
     private const MAX_DOMAIN_LABEL_LENGTH = 63;
     private const MAX_DOMAIN_LENGTH = 255;
-    
+
     // Character sets for unquoted local part
     private const LOCAL_PART_ALLOWED_CHARS = '!#$%&\'*+-/=?^_`{|}~.';
-    
+
     /**
      * Validates an email address according to RFC 5322 rules
      *
@@ -113,16 +113,16 @@ class Rfc5322Validator extends AValidator
 
         // Remove outer quotes for content validation
         $content = substr($localPart, 1, -1);
-        
+
         // Empty quoted strings are valid
         if ($content === '') {
             return true;
         }
 
         $inEscape = false;
-        for ($i = 0; $i < strlen($content); $i++) {
+        for ($i = 0, $iMax = strlen($content); $i < $iMax; $i++) {
             $char = $content[$i];
-            
+
             if ($inEscape) {
                 // Only certain characters can be escaped
                 if (!in_array($char, ['"', '\\', '(', ')', '[', ']', '<', '>', '@', ',', ';', ':', '.', ' '], true)) {
@@ -131,23 +131,23 @@ class Rfc5322Validator extends AValidator
                 $inEscape = false;
                 continue;
             }
-            
+
             if ($char === '\\') {
                 $inEscape = true;
                 continue;
             }
-            
+
             // Unescaped quotes are not allowed
             if ($char === '"') {
                 return false;
             }
-            
+
             // Allow any printable ASCII character except unescaped specials
             if (ord($char) < 32 || ord($char) > 126) {
                 return false;
             }
         }
-        
+
         // Can't end with a lone backslash
         return !$inEscape;
     }
@@ -188,7 +188,7 @@ class Rfc5322Validator extends AValidator
     private function validateDomainLiteral(string $domain): bool
     {
         // Must be enclosed in brackets
-        if (!preg_match('/^\[(.*)\]$/', $domain, $matches)) {
+        if (!preg_match('/^\[(.*)]$/', $domain, $matches)) {
             return false;
         }
 
@@ -199,7 +199,7 @@ class Rfc5322Validator extends AValidator
             $ipv6 = substr($content, 5);
             // Remove any whitespace
             $ipv6 = trim($ipv6);
-            
+
             // Handle compressed notation
             if (strpos($ipv6, '::') !== false) {
                 // Only one :: allowed
@@ -216,16 +216,16 @@ class Rfc5322Validator extends AValidator
                 // Count segments on each side
                 $leftSegments = $parts[0] ? explode(':', $parts[0]) : [];
                 $rightSegments = $parts[1] ? explode(':', $parts[1]) : [];
-                
+
                 // Calculate missing segments
                 $totalSegments = count($leftSegments) + count($rightSegments);
                 if ($totalSegments >= 8) {
                     return false;
                 }
-                
+
                 // Fill in missing segments
                 $middleSegments = array_fill(0, 8 - $totalSegments, '0');
-                
+
                 // Combine all segments
                 $segments = array_merge($leftSegments, $middleSegments, $rightSegments);
             } else {
@@ -255,7 +255,7 @@ class Rfc5322Validator extends AValidator
 
         // Handle IPv4
         $ipv4 = trim($content);
-        
+
         // Split into octets
         $octets = explode('.', $ipv4);
         if (count($octets) !== 4) {
@@ -340,4 +340,4 @@ class Rfc5322Validator extends AValidator
 
         return true;
     }
-} 
+}
