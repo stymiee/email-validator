@@ -21,6 +21,11 @@ class EmailAddress
      */
     private ?string $domain = null;
 
+    /**
+     * @var array<string>
+     */
+    private array $comments = [];
+
     public function __construct(string $email)
     {
         $this->email = $email;
@@ -39,25 +44,93 @@ class EmailAddress
      */
     private function parseEmail(): void
     {
-        // First, remove any comments
-        $email = preg_replace('/\([^)]*\)/', '', $this->email);
+        $email = $this->email;
         
-        // Handle domain literals (IP addresses in square brackets)
-        if (preg_match('/\[([^\]]+)\]$/', $email, $matches)) {
-            $this->domain = $matches[1];
-            $this->localPart = substr($email, 0, strrpos($email, '@'));
-            return;
-        }
-
+        // Extract comments while preserving their positions
+        $email = $this->extractComments($email);
+        
         // Split on the last @ symbol
-        $parts = explode('@', $email);
-        if (count($parts) < 2) {
+        $atPos = strrpos($email, '@');
+        if ($atPos === false) {
             return;
         }
 
-        $this->domain = end($parts);
-        array_pop($parts);
-        $this->localPart = implode('@', $parts);
+        $this->localPart = substr($email, 0, $atPos);
+        $this->domain = substr($email, $atPos + 1);
+    }
+
+    /**
+     * Extracts comments from an email address while preserving their positions
+     * 
+     * @param string $email The email address to process
+     * @return string The email address with comments removed
+     */
+    private function extractComments(string $email): string
+    {
+        $result = '';
+        $inComment = false;
+        $commentDepth = 0;
+        $currentComment = '';
+        $escaped = false;
+        
+        for ($i = 0; $i < strlen($email); $i++) {
+            $char = $email[$i];
+            
+            if ($escaped) {
+                if ($inComment) {
+                    $currentComment .= $char;
+                } else {
+                    $result .= $char;
+                }
+                $escaped = false;
+                continue;
+            }
+            
+            if ($char === '\\') {
+                $escaped = true;
+                if ($inComment) {
+                    $currentComment .= $char;
+                } else {
+                    $result .= $char;
+                }
+                continue;
+            }
+            
+            if ($char === '(') {
+                if ($inComment) {
+                    $commentDepth++;
+                    $currentComment .= $char;
+                } else {
+                    $inComment = true;
+                    $commentDepth = 1;
+                }
+                continue;
+            }
+            
+            if ($char === ')') {
+                if ($inComment) {
+                    $commentDepth--;
+                    if ($commentDepth === 0) {
+                        $this->comments[] = $currentComment;
+                        $currentComment = '';
+                        $inComment = false;
+                    } else {
+                        $currentComment .= $char;
+                    }
+                } else {
+                    $result .= $char;
+                }
+                continue;
+            }
+            
+            if ($inComment) {
+                $currentComment .= $char;
+            } else {
+                $result .= $char;
+            }
+        }
+        
+        return $result;
     }
 
     /**
@@ -71,7 +144,17 @@ class EmailAddress
     }
 
     /**
-     * Returns the email address.
+     * Returns the local part of the email address.
+     *
+     * @return string|null
+     */
+    public function getLocalPart(): ?string
+    {
+        return $this->localPart;
+    }
+
+    /**
+     * Returns the complete email address.
      *
      * @return string
      */
@@ -81,7 +164,17 @@ class EmailAddress
     }
 
     /**
-     * Returns the username of the email address.
+     * Returns any comments found in the email address.
+     *
+     * @return array<string>
+     */
+    public function getComments(): array
+    {
+        return $this->comments;
+    }
+
+    /**
+     * Returns the username portion of the email address.
      *
      * @since 1.1.0
      * @return string

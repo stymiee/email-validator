@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- Comprehensive RFC 5322 email validation:
+  - Added new `Rfc5322Validator` class for strict RFC compliance
+  - Added support for quoted strings in local part
+  - Added proper domain literal (IP address) validation
+  - Added comment extraction and validation
+  - Added length validation for local part and domain components
+  - Added new error code `FAIL_RFC5322` for RFC validation failures
+- Enhanced `EmailAddress` class:
+  - Added `getLocalPart()` method
+  - Added `getComments()` method
+  - Improved comment parsing with nested comment support
+  - Better handling of quoted strings and escaped characters
+
 ## 2.0.0 - 2025-05-29
 
 ### Added

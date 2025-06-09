@@ -11,6 +11,7 @@ use EmailValidator\Validator\DisposableEmailValidator;
 use EmailValidator\Validator\FreeEmailValidator;
 use EmailValidator\Validator\GmailValidator;
 use EmailValidator\Validator\MxValidator;
+use EmailValidator\Validator\Rfc5322Validator;
 
 class EmailValidator
 {
@@ -28,10 +29,17 @@ class EmailValidator
 
     public const FAIL_CUSTOM = 6;
 
+    public const FAIL_RFC5322 = 7;
+
     /**
      * @var BasicValidator
      */
     private BasicValidator $basicValidator;
+
+    /**
+     * @var Rfc5322Validator
+     */
+    private Rfc5322Validator $rfc5322Validator;
 
     /**
      * @var MxValidator
@@ -83,6 +91,7 @@ class EmailValidator
 
         $this->mxValidator = new MxValidator($policy);
         $this->basicValidator = new BasicValidator($policy);
+        $this->rfc5322Validator = new Rfc5322Validator($policy);
         $this->bannedListValidator = new BannedListValidator($policy);
         $this->disposableEmailValidator = new DisposableEmailValidator($policy);
         $this->freeEmailValidator = new FreeEmailValidator($policy);
@@ -115,6 +124,8 @@ class EmailValidator
 
         if (!$this->basicValidator->validate($this->emailAddress)) {
             $this->reason = self::FAIL_BASIC;
+        } elseif (!$this->rfc5322Validator->validate($this->emailAddress)) {
+            $this->reason = self::FAIL_RFC5322;
         } elseif (!$this->mxValidator->validate($this->emailAddress)) {
             $this->reason = self::FAIL_MX_RECORD;
         } elseif (!$this->bannedListValidator->validate($this->emailAddress)) {
@@ -158,6 +169,9 @@ class EmailValidator
         switch ($this->reason) {
             case self::FAIL_BASIC:
                 $msg = 'Invalid format';
+                break;
+            case self::FAIL_RFC5322:
+                $msg = 'Does not comply with RFC 5322';
                 break;
             case self::FAIL_MX_RECORD:
                 $msg = 'Domain does not accept email';
