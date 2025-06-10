@@ -128,7 +128,7 @@ class Rfc5322Validator extends AValidator
         }
 
         // Check for valid characters in each atom
-        return (bool)preg_match('/^[a-zA-Z0-9!#$%&\'*+\-\/=?^_`{|}~]+$/', $atom);
+        return (bool) preg_match('/^[a-zA-Z0-9!#$%&\'*+\-\/=?^_`{|}~]+$/', $atom);
     }
 
     /**
@@ -163,7 +163,7 @@ class Rfc5322Validator extends AValidator
      */
     private function hasValidQuotes(string $localPart): bool
     {
-        return (bool)preg_match('/^".*"$/', $localPart);
+        return (bool) preg_match('/^".*"$/', $localPart);
     }
 
     /**
@@ -338,7 +338,7 @@ class Rfc5322Validator extends AValidator
      */
     private function hasValidLabelFormat(string $label): bool
     {
-        return (bool)preg_match('/^[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]$/', $label);
+        return (bool) preg_match('/^[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]$/', $label);
     }
 
     /**
@@ -401,7 +401,7 @@ class Rfc5322Validator extends AValidator
         }
 
         // Convert to standard format for final validation
-        $ipv6 = implode(':', array_map(function ($segment) {
+        $ipv6 = implode(':', array_map(function($segment) {
             return str_pad($segment, 4, '0', STR_PAD_LEFT);
         }, $segments));
 
@@ -465,7 +465,7 @@ class Rfc5322Validator extends AValidator
         }
 
         // Convert to standard format for final validation
-        $ipv4 = implode('.', array_map(function ($octet) {
+        $ipv4 = implode('.', array_map(function($octet) {
             return ltrim($octet, '0') ?: '0';
         }, $octets));
 

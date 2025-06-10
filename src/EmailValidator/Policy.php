@@ -53,16 +53,16 @@ class Policy
 
     public function __construct(array $config = [])
     {
-        $this->checkMxRecords         = (bool) ($config['checkMxRecords']         ?? true);
+        $this->checkMxRecords = (bool) ($config['checkMxRecords'] ?? true);
         $this->checkBannedListedEmail = (bool) ($config['checkBannedListedEmail'] ?? false);
-        $this->checkDisposableEmail   = (bool) ($config['checkDisposableEmail']   ?? false);
-        $this->checkFreeEmail         = (bool) ($config['checkFreeEmail']         ?? false);
-        $this->localDisposableOnly    = (bool) ($config['LocalDisposableOnly']    ?? false);
-        $this->localFreeOnly          = (bool) ($config['LocalFreeOnly']          ?? false);
+        $this->checkDisposableEmail = (bool) ($config['checkDisposableEmail'] ?? false);
+        $this->checkFreeEmail = (bool) ($config['checkFreeEmail']  ?? false);
+        $this->localDisposableOnly = (bool) ($config['LocalDisposableOnly'] ?? false);
+        $this->localFreeOnly = (bool) ($config['LocalFreeOnly'] ?? false);
 
-        $this->bannedList             = $config['bannedList']     ?? [];
-        $this->disposableList         = $config['disposableList'] ?? [];
-        $this->freeList               = $config['freeList']       ?? [];
+        $this->bannedList = $config['bannedList'] ?? [];
+        $this->disposableList = $config['disposableList'] ?? [];
+        $this->freeList = $config['freeList'] ?? [];
     }
 
     /**
