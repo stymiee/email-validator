@@ -8,7 +8,7 @@
 
 The PHP Email Validator will validate an email address for all or some of the following conditions:
 
-- is in a valid format
+- is in a valid format (supports both RFC 5321 and RFC 5322)
 - has configured MX records (optional)
 - is not a disposable email address (optional)
 - is not a free email account (optional)
@@ -258,6 +258,79 @@ Custom validators will be run after all built-in validators. If a custom validat
 - Integration with external services
 - Special character restrictions
 - Custom format requirements
+
+### RFC 5322 Validation
+
+The library supports full RFC 5322 email validation, which includes:
+- Quoted strings in local parts
+- Comments in local parts and domains
+- Domain literals (IPv4 and IPv6)
+- International domain names (IDNA 2008)
+
+**Example using RFC 5322 validation**
+```php
+<?php
+
+namespace EmailValidator;
+
+require('../vendor/autoload.php');
+
+$config = [
+    'checkMxRecords' => true,
+    'useRfc5322' => true  // Enable RFC 5322 validation
+];
+$emailValidator = new EmailValidator($config);
+
+$testEmailAddresses = [
+    // Standard email addresses
+    'user@example.com',
+    
+    // Quoted strings
+    '"John Doe"@example.com',
+    '"very.unusual.@.unusual.com"@example.com',
+    
+    // Comments
+    'user(comment)@example.com',
+    'user@(comment)example.com',
+    
+    // Domain literals
+    'user@[192.0.2.1]',
+    'user@[IPv6:2001:db8::1]',
+    
+    // International domains
+    'user@münchen.de',
+    'user@xn--mnchen-3ya.de'  // Punycode
+];
+
+foreach ($testEmailAddresses as $emailAddress) {
+    $emailIsValid = $emailValidator->validate($emailAddress);
+    echo ($emailIsValid) ? 'Email is valid' : $emailValidator->getErrorReason();
+    echo PHP_EOL;
+}
+```
+
+The RFC 5322 validator supports:
+
+1. **Quoted Strings**
+   - Allows special characters and whitespace in local part when quoted
+   - Example: `"John Doe"@example.com`
+   - Example: `"very.unusual.@.unusual.com"@example.com`
+
+2. **Comments**
+   - Supports comments in both local part and domain
+   - Example: `user(comment)@example.com`
+   - Example: `user@(comment)example.com`
+
+3. **Domain Literals**
+   - Supports both IPv4 and IPv6 addresses
+   - Example: `user@[192.0.2.1]`
+   - Example: `user@[IPv6:2001:db8::1]`
+
+4. **International Domains**
+   - Full IDNA 2008 support
+   - Handles both Unicode and Punycode
+   - Example: `user@münchen.de`
+   - Example: `user@xn--mnchen-3ya.de`
 
 ## Notes
 
