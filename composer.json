@@ -1,14 +1,20 @@
 {
     "name": "stymiee/email-validator",
     "type": "library",
-    "description": "The Email Validator library builds upon PHP's built in filter_var($emailAddress, FILTER_VALIDATE_EMAIL); by adding a default MX record check. It also offers additional validation against disposable email addresses, free email address providers, and a custom banned domain list.",
+    "description": "A robust PHP 7.4+ email validation library that extends beyond basic validation with MX record checks, disposable email detection, and free email provider validation. Features include strict typing, custom validator support, internationalization (i18n), and an extensible architecture. Perfect for applications requiring thorough email verification with customizable validation rules.",
     "keywords": [
         "PHP",
         "email",
         "validation",
         "mx",
         "disposable",
-        "free-email"
+        "free-email",
+        "i18n",
+        "internationalization",
+        "custom-validators",
+        "email-verification",
+        "type-safe",
+        "strict-typing"
     ],
     "homepage": "https://github.com/stymiee/email-validator",
     "license": "Apache-2.0",
