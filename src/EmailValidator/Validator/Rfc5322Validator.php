@@ -122,12 +122,16 @@ class Rfc5322Validator extends AValidator
         $inEscape = false;
         for ($i = 0, $iMax = strlen($content); $i < $iMax; $i++) {
             $char = $content[$i];
+            $charCode = ord($char);
+
+            // Non-printable characters are never allowed
+            if ($charCode < 32 || $charCode > 126) {
+                return false;
+            }
 
             if ($inEscape) {
-                // Only certain characters can be escaped
-                if (!in_array($char, ['"', '\\', '(', ')', '[', ']', '<', '>', '@', ',', ';', ':', '.', ' '], true)) {
-                    return false;
-                }
+                // Only quotes and backslashes must be escaped
+                // Other characters may be escaped but it's not required
                 $inEscape = false;
                 continue;
             }
@@ -139,11 +143,6 @@ class Rfc5322Validator extends AValidator
 
             // Unescaped quotes are not allowed
             if ($char === '"') {
-                return false;
-            }
-
-            // Allow any printable ASCII character except unescaped specials
-            if (ord($char) < 32 || ord($char) > 126) {
                 return false;
             }
         }
@@ -237,9 +236,6 @@ class Rfc5322Validator extends AValidator
 
             // Validate each segment
             foreach ($segments as $segment) {
-                if ($segment === '') {
-                    return false;
-                }
                 if (!preg_match('/^[0-9A-Fa-f]{1,4}$/', $segment)) {
                     return false;
                 }
@@ -247,10 +243,15 @@ class Rfc5322Validator extends AValidator
 
             // Convert to standard format for final validation
             $ipv6 = implode(':', array_map(function ($segment) {
-                return str_pad($segment === '' ? '0' : $segment, 4, '0', STR_PAD_LEFT);
+                return str_pad($segment, 4, '0', STR_PAD_LEFT);
             }, $segments));
 
-            return filter_var($ipv6, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) !== false;
+            // Final validation using filter_var
+            if (!filter_var($ipv6, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+                return false;
+            }
+
+            return true;
         }
 
         // Handle IPv4

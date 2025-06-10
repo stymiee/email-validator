@@ -10,6 +10,7 @@ use EmailValidator\Validator\BasicValidator;
 use EmailValidator\Validator\DisposableEmailValidator;
 use EmailValidator\Validator\FreeEmailValidator;
 use EmailValidator\Validator\MxValidator;
+use EmailValidator\Validator\Rfc5322Validator;
 use PHPUnit\Framework\TestCase;
 use ReflectionException;
 
@@ -18,12 +19,13 @@ class EmailValidatorTest extends TestCase
     public function validateDataProvider(): array
     {
         return [
-            [EmailValidator::FAIL_BASIC, false, true, true, true, true],
-            [EmailValidator::FAIL_MX_RECORD, true, false, true, true, true],
-            [EmailValidator::FAIL_BANNED_DOMAIN, true, true, false, true, true],
-            [EmailValidator::FAIL_DISPOSABLE_DOMAIN, true, true, true, false, true],
-            [EmailValidator::FAIL_FREE_PROVIDER, true, true, true, true, false],
-            [EmailValidator::NO_ERROR, true, true, true, true, true],
+            [EmailValidator::FAIL_BASIC, false, true, true, true, true, true],
+            [EmailValidator::FAIL_RFC5322, true, false, true, true, true, true],
+            [EmailValidator::FAIL_MX_RECORD, true, true, false, true, true, true],
+            [EmailValidator::FAIL_BANNED_DOMAIN, true, true, true, false, true, true],
+            [EmailValidator::FAIL_DISPOSABLE_DOMAIN, true, true, true, true, false, true],
+            [EmailValidator::FAIL_FREE_PROVIDER, true, true, true, true, true, false],
+            [EmailValidator::NO_ERROR, true, true, true, true, true, true],
         ];
     }
 
@@ -31,55 +33,53 @@ class EmailValidatorTest extends TestCase
      * @dataProvider validateDataProvider
      * @param int $errCode
      * @param bool $basic
+     * @param bool $rfc5322
      * @param bool $mx
      * @param bool $banned
      * @param bool $disposable
      * @param bool $free
      * @throws ReflectionException
      */
-    public function testValidate(int $errCode, bool $basic, bool $mx, bool $banned, bool $disposable, bool $free): void
+    public function testValidate(int $errCode, bool $basic, bool $rfc5322, bool $mx, bool $banned, bool $disposable, bool $free): void
     {
         $emailValidator = new EmailValidator();
 
-        $basicValidator = $this->getMockBuilder(BasicValidator::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $basicValidator = $this->createMock(BasicValidator::class);
         $basicValidator->method('validate')
             ->willReturn($basic);
         $bValidator = new \ReflectionProperty($emailValidator, 'basicValidator');
         $bValidator->setAccessible(true);
         $bValidator->setValue($emailValidator, $basicValidator);
 
-        $mxValidator = $this->getMockBuilder(MxValidator::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $rfc5322Validator = $this->createMock(Rfc5322Validator::class);
+        $rfc5322Validator->method('validate')
+            ->willReturn($rfc5322);
+        $rValidator = new \ReflectionProperty($emailValidator, 'rfc5322Validator');
+        $rValidator->setAccessible(true);
+        $rValidator->setValue($emailValidator, $rfc5322Validator);
+
+        $mxValidator = $this->createMock(MxValidator::class);
         $mxValidator->method('validate')
             ->willReturn($mx);
         $mValidator = new \ReflectionProperty($emailValidator, 'mxValidator');
         $mValidator->setAccessible(true);
         $mValidator->setValue($emailValidator, $mxValidator);
 
-        $bannedValidator = $this->getMockBuilder(BannedListValidator::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $bannedValidator = $this->createMock(BannedListValidator::class);
         $bannedValidator->method('validate')
             ->willReturn($banned);
         $bnValidator = new \ReflectionProperty($emailValidator, 'bannedListValidator');
         $bnValidator->setAccessible(true);
         $bnValidator->setValue($emailValidator, $bannedValidator);
 
-        $disposableValidator = $this->getMockBuilder(DisposableEmailValidator::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $disposableValidator = $this->createMock(DisposableEmailValidator::class);
         $disposableValidator->method('validate')
             ->willReturn($disposable);
         $dValidator = new \ReflectionProperty($emailValidator, 'disposableEmailValidator');
         $dValidator->setAccessible(true);
         $dValidator->setValue($emailValidator, $disposableValidator);
 
-        $freeValidator = $this->getMockBuilder(FreeEmailValidator::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $freeValidator = $this->createMock(FreeEmailValidator::class);
         $freeValidator->method('validate')
             ->willReturn($free);
         $fValidator = new \ReflectionProperty($emailValidator, 'freeEmailValidator');
@@ -97,6 +97,7 @@ class EmailValidatorTest extends TestCase
     {
         return [
             [EmailValidator::FAIL_BASIC, 'Invalid format'],
+            [EmailValidator::FAIL_RFC5322, 'Does not comply with RFC 5322'],
             [EmailValidator::FAIL_MX_RECORD, 'Domain does not accept email'],
             [EmailValidator::FAIL_BANNED_DOMAIN, 'Domain is banned'],
             [EmailValidator::FAIL_DISPOSABLE_DOMAIN, 'Domain is used by disposable email providers'],
