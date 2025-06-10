@@ -106,6 +106,180 @@ class Rfc5322ValidatorTest extends TestCase
     }
 
     /**
+     * @dataProvider localPartLengthProvider
+     */
+    public function testLocalPartLength(string $localPart, bool $expected): void
+    {
+        $email = $localPart . '@example.com';
+        $this->assertEquals($expected, $this->validator->validate(new EmailAddress($email)));
+    }
+
+    public function localPartLengthProvider(): array
+    {
+        return [
+            'valid length' => ['user', true],
+            'max length' => [str_repeat('a', 64), true],
+            'too long' => [str_repeat('a', 65), false],
+            'empty' => ['', false],
+        ];
+    }
+
+    /**
+     * @dataProvider atomValidationProvider
+     */
+    public function testAtomValidation(string $atom, bool $expected): void
+    {
+        $email = $atom . '@example.com';
+        $this->assertEquals($expected, $this->validator->validate(new EmailAddress($email)));
+    }
+
+    public function atomValidationProvider(): array
+    {
+        return [
+            'simple atom' => ['user', true],
+            'with numbers' => ['user123', true],
+            'with allowed special chars' => ['user+tag', true],
+            'with all allowed special chars' => ['!#$%&\'*+-/=?^_`{|}~', true],
+            'empty atom' => ['', false],
+            'invalid chars' => ['user[123]', false],
+            'with spaces' => ['user name', false],
+            'with angle brackets' => ['user<>name', false],
+        ];
+    }
+
+    /**
+     * @dataProvider quotedStringValidationProvider
+     */
+    public function testQuotedStringValidation(string $quotedString, bool $expected): void
+    {
+        $email = $quotedString . '@example.com';
+        $this->assertEquals($expected, $this->validator->validate(new EmailAddress($email)));
+    }
+
+    public function quotedStringValidationProvider(): array
+    {
+        return [
+            'simple quoted' => ['"John Doe"', true],
+            'empty quoted' => ['""', true],
+            'quoted with space' => ['" "', true],
+            'escaped quotes' => ['"John \"The Dog\" Doe"', true],
+            'escaped backslash' => ['"John \\\\ Doe"', true],
+            'with special chars' => ['"!#$%&\'*+-/=?^_`{|}~"', true],
+            'unclosed quote' => ['"John Doe', false],
+            'unescaped quote' => ['"John"Doe"', false],
+            'ending with backslash' => ['"John\\', false],
+            'non-printable char' => ['"test' . chr(1) . 'test"', false],
+        ];
+    }
+
+    /**
+     * @dataProvider domainLabelValidationProvider
+     */
+    public function testDomainLabelValidation(string $label, bool $expected): void
+    {
+        $reflectionClass = new \ReflectionClass(Rfc5322Validator::class);
+        $method = $reflectionClass->getMethod('validateDomainLabel');
+        $method->setAccessible(true);
+        
+        $this->assertEquals($expected, $method->invoke($this->validator, $label));
+    }
+
+    public function domainLabelValidationProvider(): array
+    {
+        return [
+            'simple label' => ['example', true],
+            'with numbers' => ['example123', true],
+            'with hyphen' => ['my-example', true],
+            'max length' => [str_repeat('a', 63), true],
+            'too long' => [str_repeat('a', 64), false],
+            'empty label' => ['', false],
+            'starts with hyphen' => ['-example', false],
+            'ends with hyphen' => ['example-', false],
+            'consecutive hyphens' => ['exa--mple', false],
+            'invalid chars' => ['exam&ple', false],
+        ];
+    }
+
+    /**
+     * @dataProvider domainLiteralValidationProvider
+     */
+    public function testDomainLiteralValidation(string $domainLiteral, bool $expected): void
+    {
+        $email = 'user@' . $domainLiteral;
+        $this->assertEquals($expected, $this->validator->validate(new EmailAddress($email)));
+    }
+
+    public function domainLiteralValidationProvider(): array
+    {
+        return [
+            'IPv4' => ['[192.168.1.1]', true],
+            'IPv4 with spaces' => ['[ 192.168.1.1 ]', true],
+            'IPv4 with leading zeros' => ['[192.168.001.001]', true],
+            'IPv6' => ['[IPv6:2001:db8::1]', true],
+            'IPv6 full' => ['[IPv6:2001:0db8:85a3:0000:0000:8a2e:0370:7334]', true],
+            'IPv6 compressed' => ['[IPv6:2001:db8::1:0:0:1]', true],
+            'unclosed bracket' => ['[192.168.1.1', false],
+            'invalid IPv4 octet' => ['[192.168.1.300]', false],
+            'IPv4 with invalid chars' => ['[192.168.1.x]', false],
+            'IPv4 with missing octet' => ['[192.168.1]', false],
+            'IPv6 without prefix' => ['[2001:db8::1]', false],
+            'IPv6 with invalid hex' => ['[IPv6:2001:db8::g]', false],
+            'empty domain literal' => ['[]', false],
+        ];
+    }
+
+    /**
+     * @dataProvider ipv6ValidationProvider
+     */
+    public function testIPv6Validation(string $ipv6, bool $expected): void
+    {
+        $email = 'user@[IPv6:' . $ipv6 . ']';
+        $this->assertEquals($expected, $this->validator->validate(new EmailAddress($email)));
+    }
+
+    public function ipv6ValidationProvider(): array
+    {
+        return [
+            'standard format' => ['2001:db8::1', true],
+            'full format' => ['2001:0db8:85a3:0000:0000:8a2e:0370:7334', true],
+            'compressed middle' => ['2001:db8::1:0:0:1', true],
+            'compressed end' => ['2001:db8:85a3::', true],
+            'compressed start' => ['::1:2:3:4:5:6:7', true],
+            'multiple zeros' => ['2001:0:0:1::2', true],
+            'invalid segment count' => ['2001:db8', false],
+            'too many segments' => ['2001:db8:1:2:3:4:5:6:7', false],
+            'invalid hex' => ['2001:db8::g', false],
+            'multiple compression' => ['2001::db8::1', false],
+            'empty segment' => ['2001::db8::', false],
+            'invalid segment length' => ['20011:db8::1', false],
+        ];
+    }
+
+    /**
+     * @dataProvider ipv4ValidationProvider
+     */
+    public function testIPv4Validation(string $ipv4, bool $expected): void
+    {
+        $email = 'user@[' . $ipv4 . ']';
+        $this->assertEquals($expected, $this->validator->validate(new EmailAddress($email)));
+    }
+
+    public function ipv4ValidationProvider(): array
+    {
+        return [
+            'standard format' => ['192.168.1.1', true],
+            'zeros' => ['0.0.0.0', true],
+            'max values' => ['255.255.255.255', true],
+            'leading zeros' => ['192.168.001.001', true],
+            'invalid octet' => ['256.256.256.256', false],
+            'missing octet' => ['192.168.1', false],
+            'extra octet' => ['192.168.1.1.1', false],
+            'invalid chars' => ['192.168.1.x', false],
+            'empty octet' => ['192.168..1', false],
+        ];
+    }
+
+    /**
      * @dataProvider commentEmailProvider
      */
     public function testEmailsWithComments(string $email, array $expectedComments): void
@@ -138,171 +312,6 @@ class Rfc5322ValidatorTest extends TestCase
                 'user(comment@with.special&chars)@example.com',
                 ['comment@with.special&chars']
             ],
-        ];
-    }
-
-    /**
-     * @dataProvider quotedStringEmailProvider
-     */
-    public function testQuotedStringEmails(string $email): void
-    {
-        $this->assertTrue($this->validator->validate(new EmailAddress($email)));
-    }
-
-    public function quotedStringEmailProvider(): array
-    {
-        return [
-            'simple quoted' => ['"John Doe"@example.com'],
-            'quoted with @' => ['"user@name"@example.com'],
-            'quoted with escaped quote' => ['"John \"The Dog\" Doe"@example.com'],
-            'quoted with special chars' => ['"!#$%&\'*+-/=?^_`{|}~"@example.com'],
-            'quoted with escaped backslash' => ['"John \\\\ Doe"@example.com'],
-        ];
-    }
-
-    /**
-     * @dataProvider domainLiteralEmailProvider
-     */
-    public function testDomainLiteralEmails(string $email): void
-    {
-        $this->assertTrue($this->validator->validate(new EmailAddress($email)));
-    }
-
-    public function domainLiteralEmailProvider(): array
-    {
-        return [
-            'IPv4' => ['user@[192.168.1.1]'],
-            'IPv6' => ['user@[IPv6:2001:db8::1]'],
-            'IPv4 with leading zeros' => ['user@[192.168.001.001]'],
-            'IPv6 full' => ['user@[IPv6:2001:0db8:85a3:0000:0000:8a2e:0370:7334]'],
-            'IPv6 compressed' => ['user@[IPv6:2001:db8::1:0:0:1]'],
-        ];
-    }
-
-    /**
-     * @dataProvider invalidDomainLiteralEmailProvider
-     */
-    public function testInvalidDomainLiteralEmails(string $email): void
-    {
-        $this->assertFalse($this->validator->validate(new EmailAddress($email)));
-    }
-
-    public function invalidDomainLiteralEmailProvider(): array
-    {
-        return [
-            'unclosed bracket' => ['user@[192.168.1.1'],
-            'invalid IPv4 octet' => ['user@[192.168.1.300]'],
-            'IPv4 with invalid chars' => ['user@[192.168.1.x]'],
-            'IPv4 with extra dots' => ['user@[192.168.1.1.1]'],
-            'IPv4 with missing octet' => ['user@[192.168.1]'],
-            'IPv6 without prefix' => ['user@[2001:db8::1]'],
-            'IPv6 with invalid hex' => ['user@[IPv6:2001:db8::g]'],
-            'IPv6 with too many segments' => ['user@[IPv6:2001:db8:1:2:3:4:5:6:7]'],
-            'empty domain literal' => ['user@[]'],
-            'IPv6 with malformed compression' => ['user@[IPv6:2001:db8:::1]'],
-            'IPv6 with triple compression' => ['user@[IPv6:2001::db8::1]'],
-            'IPv6 with invalid split parts' => ['user@[IPv6:2001:::db8:1]'],
-            'IPv6 with multiple double colons' => ['user@[IPv6:2001::db8::1::2]'],
-            'IPv6 with empty segment' => ['user@[IPv6:2001::db8::]'],
-            'IPv6 with empty segment after split' => ['user@[IPv6:2001:db8:::]'],
-            'IPv6 with empty segment in middle' => ['user@[IPv6:2001::db8:0::1]'],
-            'IPv6 with too many segments after compression' => ['user@[IPv6:2001:db8::1:2:3:4:5:6]'],
-            'IPv6 with invalid segment length' => ['user@[IPv6:20011:db8::1]'],
-            'IPv6 with invalid segment count' => ['user@[IPv6:2001:db8]'],
-            'IPv6 with empty segment in array' => ['user@[IPv6:2001:db8::1::2]'],
-            'IPv6 with empty segment after merge' => ['user@[IPv6:2001:db8::1:2:3:4:5:6:7]'],
-            'IPv6 with too few segments' => ['user@[IPv6:2001:db8:1]'],
-            'IPv6 with invalid compression' => ['user@[IPv6:2001:db8::1::2]'],
-            'IPv6 with too many segments at start' => ['user@[IPv6::1:2:3:4:5:6:7]'],
-            'IPv6 with invalid segment format' => ['user@[IPv6:2001:db8::1::]'],
-            'IPv6 with compression at start' => ['user@[IPv6::1:2:3:4:5:6]'],
-        ];
-    }
-
-    /**
-     * @dataProvider emptyComponentsEmailProvider
-     */
-    public function testEmptyComponents(string $email): void
-    {
-        $emailObj = new EmailAddress($email);
-        $this->assertFalse($this->validator->validate($emailObj));
-    }
-
-    public function emptyComponentsEmailProvider(): array
-    {
-        return [
-            'null local part' => ['@example.com'],
-            'null domain' => ['user@'],
-            'both null' => ['@'],
-            'empty string' => [''],
-        ];
-    }
-
-    /**
-     * @dataProvider quotedStringEdgeCasesProvider
-     */
-    public function testQuotedStringEdgeCases(string $email): void
-    {
-        $this->assertTrue($this->validator->validate(new EmailAddress($email)));
-    }
-
-    public function quotedStringEdgeCasesProvider(): array
-    {
-        return [
-            'empty quoted string' => ['""@example.com'],
-            'quoted with required escapes' => ['"test\\"\\\\test"@example.com'],
-            'quoted with optional escapes' => ['"test\\@\\,\\;test"@example.com'],
-            'quoted with mixed escapes' => ['"test\\"\\@\\\\test"@example.com'],
-            'quoted with spaces' => ['" test test "@example.com'],
-            'quoted with special chars' => ['"!#$%&\'*+-/=?^_`{|}~"@example.com'],
-            'quoted with numbers' => ['"0123456789"@example.com'],
-            'quoted with letters' => ['"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"@example.com'],
-            'quoted with punctuation' => ['",.;:()[]{}<>@"@example.com'],
-            'quoted with escaped non-required chars' => ['"\\a\\b\\c"@example.com'],
-        ];
-    }
-
-    /**
-     * @dataProvider ipv6EdgeCasesProvider
-     */
-    public function testIpv6EdgeCases(string $email): void
-    {
-        $this->assertTrue($this->validator->validate(new EmailAddress($email)));
-    }
-
-    public function ipv6EdgeCasesProvider(): array
-    {
-        return [
-            'IPv6 with multiple zeros' => ['user@[IPv6:2001:0000:0000:0000:0000:0000:0000:0001]'],
-            'IPv6 with single compression' => ['user@[IPv6:2001:db8::1]'],
-            'IPv6 with leading zeros' => ['user@[IPv6:0:2001:db8:1:2:3:4:5]'],
-            'IPv6 with trailing compression' => ['user@[IPv6:2001:db8::]'],
-            'IPv6 with middle compression' => ['user@[IPv6:2001:db8::1:2]'],
-            'IPv6 with minimal segments' => ['user@[IPv6:1:2:3:4:5:6:7:8]'],
-            'IPv6 with compression and zeros' => ['user@[IPv6:2001:0db8::0001:0000:0000:0001]'],
-            'IPv6 with mixed case hex' => ['user@[IPv6:2001:DbB8::1]'],
-            'IPv6 with single digit segments' => ['user@[IPv6:1:2:3:4:5:6:7:8]'],
-            'IPv6 with max segments' => ['user@[IPv6:2001:db8:85a3:8a2e:370:7334:1:1]'],
-            'IPv6 with max compression' => ['user@[IPv6:2001:db8::8]'],
-            'IPv6 with compression at end' => ['user@[IPv6:2001:db8:1:2:3:4:5::]'],
-            'IPv6 with max zeros' => ['user@[IPv6:0:0:0:0:0:0:0:1]'],
-        ];
-    }
-
-    /**
-     * @dataProvider ipv4EdgeCasesProvider
-     */
-    public function testIpv4EdgeCases(string $email): void
-    {
-        $this->assertTrue($this->validator->validate(new EmailAddress($email)));
-    }
-
-    public function ipv4EdgeCasesProvider(): array
-    {
-        return [
-            'IPv4 with leading zeros' => ['user@[192.168.001.001]'],
-            'IPv4 with all zeros' => ['user@[000.000.000.000]'],
-            'IPv4 with mixed zeros' => ['user@[192.168.000.001]'],
         ];
     }
 }

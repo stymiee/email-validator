@@ -54,7 +54,7 @@ class Rfc5322Validator extends AValidator
     private function validateLocalPart(string $localPart): bool
     {
         // Check length
-        if (strlen($localPart) > self::MAX_LOCAL_PART_LENGTH) {
+        if (!$this->validateLocalPartLength($localPart)) {
             return false;
         }
 
@@ -64,12 +64,34 @@ class Rfc5322Validator extends AValidator
         }
 
         // Handle quoted string
-        if ($localPart[0] === '"') {
+        if ($this->isQuotedString($localPart)) {
             return $this->validateQuotedString($localPart);
         }
 
         // Handle dot-atom format
         return $this->validateDotAtom($localPart);
+    }
+
+    /**
+     * Validates the length of a local part
+     *
+     * @param string $localPart The local part to validate
+     * @return bool True if the length is valid
+     */
+    private function validateLocalPartLength(string $localPart): bool
+    {
+        return strlen($localPart) <= self::MAX_LOCAL_PART_LENGTH;
+    }
+
+    /**
+     * Checks if a local part is a quoted string
+     *
+     * @param string $localPart The local part to check
+     * @return bool True if the local part is a quoted string
+     */
+    private function isQuotedString(string $localPart): bool
+    {
+        return $localPart[0] === '"';
     }
 
     /**
@@ -85,17 +107,28 @@ class Rfc5322Validator extends AValidator
 
         // Check each atom
         foreach ($atoms as $atom) {
-            if ($atom === '') {
-                return false;
-            }
-
-            // Check for valid characters in each atom
-            if (!preg_match('/^[a-zA-Z0-9!#$%&\'*+\-\/=?^_`{|}~]+$/', $atom)) {
+            if (!$this->validateAtom($atom)) {
                 return false;
             }
         }
 
         return true;
+    }
+
+    /**
+     * Validates a single atom in a dot-atom local part
+     *
+     * @param string $atom The atom to validate
+     * @return bool True if the atom is valid
+     */
+    private function validateAtom(string $atom): bool
+    {
+        if ($atom === '') {
+            return false;
+        }
+
+        // Check for valid characters in each atom
+        return (bool)preg_match('/^[a-zA-Z0-9!#$%&\'*+\-\/=?^_`{|}~]+$/', $atom);
     }
 
     /**
@@ -107,7 +140,7 @@ class Rfc5322Validator extends AValidator
     private function validateQuotedString(string $localPart): bool
     {
         // Must start and end with quotes
-        if (!preg_match('/^".*"$/', $localPart)) {
+        if (!$this->hasValidQuotes($localPart)) {
             return false;
         }
 
@@ -119,6 +152,28 @@ class Rfc5322Validator extends AValidator
             return true;
         }
 
+        return $this->validateQuotedStringContent($content);
+    }
+
+    /**
+     * Checks if a quoted string has valid opening and closing quotes
+     *
+     * @param string $localPart The quoted string to validate
+     * @return bool True if the quotes are valid
+     */
+    private function hasValidQuotes(string $localPart): bool
+    {
+        return (bool)preg_match('/^".*"$/', $localPart);
+    }
+
+    /**
+     * Validates the content of a quoted string
+     *
+     * @param string $content The content to validate (without outer quotes)
+     * @return bool True if the content is valid
+     */
+    private function validateQuotedStringContent(string $content): bool
+    {
         $inEscape = false;
         for ($i = 0, $iMax = strlen($content); $i < $iMax; $i++) {
             $char = $content[$i];
@@ -165,12 +220,12 @@ class Rfc5322Validator extends AValidator
         }
 
         // Check total length
-        if (strlen($domain) > self::MAX_DOMAIN_LENGTH) {
+        if (!$this->validateDomainLength($domain)) {
             return false;
         }
 
         // Handle domain literal
-        if ($domain[0] === '[') {
+        if ($this->isDomainLiteral($domain)) {
             return $this->validateDomainLiteral($domain);
         }
 
@@ -179,110 +234,25 @@ class Rfc5322Validator extends AValidator
     }
 
     /**
-     * Validates a domain literal (IP address in brackets)
+     * Validates the length of a domain
      *
-     * @param string $domain The domain literal to validate
-     * @return bool True if the domain literal is valid
+     * @param string $domain The domain to validate
+     * @return bool True if the length is valid
      */
-    private function validateDomainLiteral(string $domain): bool
+    private function validateDomainLength(string $domain): bool
     {
-        // Must be enclosed in brackets
-        if (!preg_match('/^\[(.*)]$/', $domain, $matches)) {
-            return false;
-        }
+        return strlen($domain) <= self::MAX_DOMAIN_LENGTH;
+    }
 
-        $content = $matches[1];
-
-        // Handle IPv6
-        if (stripos($content, 'IPv6:') === 0) {
-            $ipv6 = substr($content, 5);
-            // Remove any whitespace
-            $ipv6 = trim($ipv6);
-
-            // Handle compressed notation
-            if (strpos($ipv6, '::') !== false) {
-                // Only one :: allowed
-                if (substr_count($ipv6, '::') > 1) {
-                    return false;
-                }
-
-                // Split on ::
-                $parts = explode('::', $ipv6);
-                if (count($parts) !== 2) {
-                    return false;
-                }
-
-                // Count segments on each side
-                $leftSegments = $parts[0] ? explode(':', $parts[0]) : [];
-                $rightSegments = $parts[1] ? explode(':', $parts[1]) : [];
-
-                // Calculate missing segments
-                $totalSegments = count($leftSegments) + count($rightSegments);
-                if ($totalSegments >= 8) {
-                    return false;
-                }
-
-                // Fill in missing segments
-                $middleSegments = array_fill(0, 8 - $totalSegments, '0');
-
-                // Combine all segments
-                $segments = array_merge($leftSegments, $middleSegments, $rightSegments);
-            } else {
-                $segments = explode(':', $ipv6);
-                if (count($segments) !== 8) {
-                    return false;
-                }
-            }
-
-            // Validate each segment
-            foreach ($segments as $segment) {
-                if (!preg_match('/^[0-9A-Fa-f]{1,4}$/', $segment)) {
-                    return false;
-                }
-            }
-
-            // Convert to standard format for final validation
-            $ipv6 = implode(':', array_map(function ($segment) {
-                return str_pad($segment, 4, '0', STR_PAD_LEFT);
-            }, $segments));
-
-            // Final validation using filter_var
-            if (!filter_var($ipv6, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
-                return false;
-            }
-
-            return true;
-        }
-
-        // Handle IPv4
-        $ipv4 = trim($content);
-
-        // Split into octets
-        $octets = explode('.', $ipv4);
-        if (count($octets) !== 4) {
-            return false;
-        }
-
-        // Validate each octet
-        foreach ($octets as $octet) {
-            // Remove leading zeros
-            $octet = ltrim($octet, '0');
-            if ($octet === '') {
-                $octet = '0';
-            }
-
-            // Check numeric value
-            if (!is_numeric($octet) || intval($octet) < 0 || intval($octet) > 255) {
-                return false;
-            }
-        }
-
-        // Convert to standard format for final validation
-        $ipv4 = implode('.', array_map(function ($octet) {
-            return ltrim($octet, '0') ?: '0';
-        }, $octets));
-
-        return filter_var($ipv4, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) !== false;
+    /**
+     * Checks if a domain is a domain literal
+     *
+     * @param string $domain The domain to check
+     * @return bool True if the domain is a domain literal
+     */
+    private function isDomainLiteral(string $domain): bool
+    {
+        return $domain[0] === '[';
     }
 
     /**
@@ -320,25 +290,221 @@ class Rfc5322Validator extends AValidator
     private function validateDomainLabel(string $label): bool
     {
         // Check length
-        if (strlen($label) > self::MAX_DOMAIN_LABEL_LENGTH || $label === '') {
+        if (!$this->validateDomainLabelLength($label)) {
             return false;
         }
 
         // Must start and end with alphanumeric
-        if (!ctype_alnum($label[0]) || !ctype_alnum(substr($label, -1))) {
+        if (!$this->hasValidLabelBoundaries($label)) {
             return false;
         }
 
-        // Check for valid characters (alphanumeric and hyphen)
-        if (!preg_match('/^[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]$/', $label)) {
+        // Check for valid characters and format
+        if (!$this->hasValidLabelFormat($label)) {
             return false;
         }
 
         // Check for consecutive hyphens
-        if (strpos($label, '--') !== false) {
+        return !$this->hasConsecutiveHyphens($label);
+    }
+
+    /**
+     * Validates the length of a domain label
+     *
+     * @param string $label The domain label to validate
+     * @return bool True if the length is valid
+     */
+    private function validateDomainLabelLength(string $label): bool
+    {
+        return strlen($label) <= self::MAX_DOMAIN_LABEL_LENGTH && $label !== '';
+    }
+
+    /**
+     * Checks if a domain label has valid start and end characters
+     *
+     * @param string $label The domain label to validate
+     * @return bool True if the boundaries are valid
+     */
+    private function hasValidLabelBoundaries(string $label): bool
+    {
+        return ctype_alnum($label[0]) && ctype_alnum(substr($label, -1));
+    }
+
+    /**
+     * Checks if a domain label has valid format
+     *
+     * @param string $label The domain label to validate
+     * @return bool True if the format is valid
+     */
+    private function hasValidLabelFormat(string $label): bool
+    {
+        return (bool)preg_match('/^[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]$/', $label);
+    }
+
+    /**
+     * Checks if a domain label has consecutive hyphens
+     *
+     * @param string $label The domain label to validate
+     * @return bool True if the label has consecutive hyphens
+     */
+    private function hasConsecutiveHyphens(string $label): bool
+    {
+        return strpos($label, '--') !== false;
+    }
+
+    /**
+     * Validates a domain literal (IP address in brackets)
+     *
+     * @param string $domain The domain literal to validate
+     * @return bool True if the domain literal is valid
+     */
+    private function validateDomainLiteral(string $domain): bool
+    {
+        // Must be enclosed in brackets
+        if (!preg_match('/^\[(.*)]$/', $domain, $matches)) {
             return false;
         }
 
-        return true;
+        $content = $matches[1];
+
+        // Handle IPv6
+        if (stripos($content, 'IPv6:') === 0) {
+            return $this->validateIPv6($content);
+        }
+
+        // Handle IPv4
+        return $this->validateIPv4($content);
+    }
+
+    /**
+     * Validates an IPv6 address
+     *
+     * @param string $content The IPv6 address to validate (including 'IPv6:' prefix)
+     * @return bool True if the IPv6 address is valid
+     */
+    private function validateIPv6(string $content): bool
+    {
+        $ipv6 = substr($content, 5);
+        // Remove any whitespace
+        $ipv6 = trim($ipv6);
+
+        $segments = $this->parseIPv6Segments($ipv6);
+        if ($segments === null) {
+            return false;
+        }
+
+        // Validate each segment
+        foreach ($segments as $segment) {
+            if (!preg_match('/^[0-9A-Fa-f]{1,4}$/', $segment)) {
+                return false;
+            }
+        }
+
+        // Convert to standard format for final validation
+        $ipv6 = implode(':', array_map(function ($segment) {
+            return str_pad($segment, 4, '0', STR_PAD_LEFT);
+        }, $segments));
+
+        return filter_var($ipv6, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) !== false;
+    }
+
+    /**
+     * Parses IPv6 address segments, handling compressed notation
+     *
+     * @param string $ipv6 The IPv6 address to parse
+     * @return array|null Array of segments if valid, null if invalid
+     */
+    private function parseIPv6Segments(string $ipv6): ?array
+    {
+        // Handle compressed notation
+        if (strpos($ipv6, '::') !== false) {
+            // Only one :: allowed
+            if (substr_count($ipv6, '::') > 1) {
+                return null;
+            }
+
+            // Split on ::
+            $parts = explode('::', $ipv6);
+            if (count($parts) !== 2) {
+                return null;
+            }
+
+            // Count segments on each side
+            $leftSegments = $parts[0] ? explode(':', $parts[0]) : [];
+            $rightSegments = $parts[1] ? explode(':', $parts[1]) : [];
+
+            // Calculate missing segments
+            $totalSegments = count($leftSegments) + count($rightSegments);
+            if ($totalSegments >= 8) {
+                return null;
+            }
+
+            // Fill in missing segments
+            $middleSegments = array_fill(0, 8 - $totalSegments, '0');
+
+            // Combine all segments
+            return array_merge($leftSegments, $middleSegments, $rightSegments);
+        }
+
+        $segments = explode(':', $ipv6);
+        return count($segments) === 8 ? $segments : null;
+    }
+
+    /**
+     * Validates an IPv4 address
+     *
+     * @param string $content The IPv4 address to validate
+     * @return bool True if the IPv4 address is valid
+     */
+    private function validateIPv4(string $content): bool
+    {
+        $ipv4 = trim($content);
+        $octets = $this->parseIPv4Octets($ipv4);
+        if ($octets === null) {
+            return false;
+        }
+
+        // Convert to standard format for final validation
+        $ipv4 = implode('.', array_map(function ($octet) {
+            return ltrim($octet, '0') ?: '0';
+        }, $octets));
+
+        return filter_var($ipv4, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) !== false;
+    }
+
+    /**
+     * Parses IPv4 address octets
+     *
+     * @param string $ipv4 The IPv4 address to parse
+     * @return array|null Array of octets if valid, null if invalid
+     */
+    private function parseIPv4Octets(string $ipv4): ?array
+    {
+        // Split into octets
+        $octets = explode('.', $ipv4);
+        if (count($octets) !== 4) {
+            return null;
+        }
+
+        // Validate each octet
+        foreach ($octets as $octet) {
+            // Empty octets are invalid
+            if ($octet === '') {
+                return null;
+            }
+
+            // Remove leading zeros
+            $octet = ltrim($octet, '0');
+            if ($octet === '') {
+                $octet = '0';
+            }
+
+            // Check numeric value
+            if (!is_numeric($octet) || intval($octet) < 0 || intval($octet) > 255) {
+                return null;
+            }
+        }
+
+        return $octets;
     }
 }
